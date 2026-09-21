@@ -3,6 +3,8 @@
 **Company**: Dodail Solutions Private Limited  
 **Current Date**: September 2026  
 **Status**: Active Production MVP  
+**Repository**: https://github.com/DodailSolutions/tinyride.git  
+**Supabase Project**: https://orseixsidgyhqrkndxeb.supabase.co
 
 ---
 
@@ -10,51 +12,169 @@
 
 | Phase | Description | Status | Progress | Highlights |
 |---|---|---|---|---|
-| **Phase 1** | Monorepo Setup, Shared Packages, Supabase DB & RLS | 🟢 Completed | 100% | pnpm monorepo, 5 packages, 3 DB migrations, RLS, Hyderabad seed data, Vitest tests passing |
-| **Phase 2** | Parent Profile, Multiple Children & Schools | 🟢 Completed | 100% | `apps/parent` Expo Router app with child profiles, guardian setup, Hyderabad schools |
-| **Phase 3** | Driver Onboarding, Documents & Admin KYC | 🟢 Completed | 100% | `apps/admin` KYC Desk with Telangana DL/FC/PCC auditing & approve/reject workflows |
-| **Phase 4** | Route Configuration, Discovery & Seat Booking | 🟢 Completed | 100% | Route discovery screen, capacity checks, immutable fare snapshots, atomic seat locking RPC |
-| **Phase 5** | Razorpay Payments & Subscriptions | 🟢 Completed | 100% | Edge Functions (`create-razorpay-order`, `razorpay-webhook`), HMAC verification, subscription cycles |
-| **Phase 6** | Driver Trip Execution, Offline Sync & Milestones | 🟢 Completed | 100% | `apps/driver` Expo Router app, two-tap trip execution, UUID idempotency keys, offline sync queue |
-| **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 10 static routes built, live trip monitor, safety incident desk |
-| **Phase 8** | Google OR-Tools Route Optimization | 🟢 Completed | 100% | `services/route-optimizer` CVRPTW solver, distance & time saving calculations, human-in-the-loop review |
-| **Phase 9** | AI Support Assistant & Assistive OCR | 🟢 Completed | 100% | Edge Function `ai-support-assistant`, in-app support chat, emergency hotline escalation |
-| **Phase 10** | Security Hardening & App Store Readiness | 🟢 Completed | 100% | Bundle IDs (`com.dodail.tinyride.parent`, `com.dodail.tinyride.driver`), `.env.example`, automated test suites |
+| **Phase 1** | Monorepo Setup, Shared Packages, Supabase DB & RLS | 🟢 Completed | 100% | pnpm monorepo, 5 packages, 5 DB migrations, RLS on 18 tables, audit log triggers, typed DB schema, auth helpers, 40/40 tests |
+| **Phase 2** | Parent Profile, Multiple Children & Schools | 🟡 Scaffolded | 40% | `apps/parent` Expo Router app scaffolded with child profiles, guardian setup, Hyderabad schools |
+| **Phase 3** | Driver Onboarding, Documents & Admin KYC | 🟡 Scaffolded | 40% | `apps/admin` KYC Desk with Telangana DL/FC/PCC auditing & approve/reject workflows |
+| **Phase 4** | Route Configuration, Discovery & Seat Booking | 🟡 Scaffolded | 30% | Route discovery screen, capacity checks, immutable fare snapshots, atomic seat locking RPC |
+| **Phase 5** | Razorpay Payments & Subscriptions | 🟡 Scaffolded | 30% | Edge Functions (`create-razorpay-order`, `razorpay-webhook`) scaffolded, HMAC verification logic written |
+| **Phase 6** | Driver Trip Execution, Offline Sync & Milestones | 🟡 Scaffolded | 30% | `apps/driver` Expo Router app scaffolded, two-tap trip execution, UUID idempotency keys, offline sync queue |
+| **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 14 static routes built, live trip monitor, safety incident desk |
+| **Phase 8** | Google OR-Tools Route Optimization | 🟡 Scaffolded | 70% | `services/route-optimizer` CVRPTW solver implemented and tested |
+| **Phase 9** | AI Support Assistant & Assistive OCR | 🟡 Scaffolded | 30% | Edge Function `ai-support-assistant` scaffolded |
+| **Phase 10** | Security Hardening & App Store Readiness | 🔴 Not Started | 5% | Bundle IDs defined in ARCHITECTURE.md, EAS config pending |
+
+---
+
+## Phase 1 — Full Completion Checklist
+
+### ✅ Monorepo Foundation
+- [x] `pnpm` workspaces + `turbo.json` Turborepo pipeline
+- [x] `packages/config`: `tsconfig.base.json` with strict mode, `noUncheckedIndexedAccess: true`
+- [x] `.env.example` with full credential segregation guide
+- [x] `.gitignore` covers `.env`, `node_modules`, `.turbo`, build artifacts
+- [x] Root-level `vitest.config.ts` with env var injection for tests
+
+### ✅ Shared TypeScript Packages
+- [x] `@tinyride/types`: Domain interfaces, Enums, DB types (`database.ts` — row types for all 18 tables), CMS types, optimizer types
+- [x] `@tinyride/validation`: Zod schemas — Indian phone (+91 E.164), Telangana registration regex, seat capacity limits, UUID idempotency, CMS schemas
+- [x] `@tinyride/ui`: Visual tokens, INR formatters, Brand Guidelines v1.0 tokens (Navy `#142B4A`, Orange `#F07832`, Mist `#F3F5F7`, Slate `#2F3948`, White `#FFFFFF`)
+- [x] `@tinyride/api-client`: Supabase typed client (`initializeTinyRideClient`, `getTinyRideClient`), `OfflineTripSyncQueue` with atomic UUID-keyed retry, auth helpers (`requestOtp`, `verifyOtp`, `getSession`, `onAuthStateChange`, `resolveUserRole`, `requestEmailOtp`)
+
+### ✅ Supabase Database Schema (Local Migrations)
+| Migration | Description | Tables / Objects |
+|---|---|---|
+| `20260921000001_initial_schema.sql` | Core schema (494 lines) | 18 tables, 14+ enums, `has_role()` SECURITY DEFINER helper, 16 performance indexes |
+| `20260921000002_rls_and_triggers.sql` | RLS & auth automation (254 lines) | RLS enabled on all 18 tables, `set_updated_at()` trigger, `handle_new_user()` auth trigger |
+| `20260921000003_seat_locking_rpc.sql` | Atomic seat reservation (53 lines) | `increment_route_reserved_seats`, `decrement_route_reserved_seats` — pessimistic FOR UPDATE lock |
+| `20260921000004_cms_schema.sql` | CMS content tables (167 lines) | `cms_settings`, `faqs`, `articles`, `testimonials`, `leads` |
+| `20260921000005_audit_log_triggers.sql` | Audit log triggers (new) | `write_audit_log()` SECURITY DEFINER trigger on 10 sensitive tables, `write_privileged_audit_log()` RPC for admin actions with IP/UA capture |
+
+**Consolidated file**: `supabase/full_schema_and_seed.sql` (1,210 lines) — paste into Supabase SQL Editor at https://supabase.com/dashboard/project/orseixsidgyhqrkndxeb/sql/new
+
+### ✅ Row Level Security (RLS) Policy Coverage
+| Table | Parent | Driver | Admin | Anon |
+|---|---|---|---|---|
+| `profiles` | Own row only | Own row only | Full read | ❌ |
+| `children` | Own children only | Assigned route children during ACTIVE trips only | Full | ❌ |
+| `drivers` | VERIFIED rows (for discovery) | Own row | Full | ❌ |
+| `vehicles` | ❌ | Own vehicles | Full | ❌ |
+| `driver_documents` | ❌ | Own docs | Full | ❌ |
+| `routes` | ACTIVE routes only | Own routes | Full | ❌ |
+| `bookings` | Own bookings | Bookings on own routes | Full | ❌ |
+| `payments` | Own payments (SELECT only) | ❌ (service_role only) | Full | ❌ |
+| `trips` | Via active bookings | Own trips | Full | ❌ |
+| `trip_events` | Own children's events | Own trips' events | Full | ❌ |
+| `audit_logs` | ❌ | ❌ | super_admin only | ❌ |
+
+### ✅ Audit Logging
+- [x] Generic `write_audit_log()` trigger fires AFTER INSERT/UPDATE/DELETE on 10 sensitive tables
+- [x] Captures: actor_id (auth.uid()), actor_role (from profiles), action (table_CREATED/UPDATED/DELETED), before/after JSONB diff
+- [x] `write_privileged_audit_log()` RPC for Edge Functions/Server Actions: captures ip_address and user_agent
+- [x] `audit_logs` table is append-only (no UPDATE/DELETE policies defined — immutable by design)
+
+### ✅ Authentication Configuration
+- [x] Auth helpers: `requestOtp(phone)` → `verifyOtp(phone, otp)` OTP flow
+- [x] Admin email magic link: `requestEmailOtp(email, redirectTo)` for Next.js admin portal
+- [x] Role resolution: always from `profiles.role` DB column (never JWT claims alone)
+- [x] Anti-escalation guard: `handle_new_user()` trigger clamps self-provisioned roles to `parent|driver` only
+- [x] Session management: `getSession()`, `onAuthStateChange()`, `signOut()`
+
+### ✅ Test Suite
+- [x] **40/40 tests passing** (`pnpm test`)
+- [x] `packages/ui/src/theme.test.ts` — 4 tests (Brand Guidelines v1.0 color tokens)
+- [x] `packages/validation/src/index.test.ts` — 7 tests (phone, OTP, vehicle, trip event schemas)
+- [x] `packages/api-client/src/sync-queue.test.ts` — 2 tests (offline sync idempotency)
+- [x] `packages/api-client/src/rls.test.ts` — 27 tests:
+  - **RLS Configuration Validation** (4 tests, run when credentials present): JWT format, service_role claim, project ref
+  - **RLS Policy Axioms** (7 tests, always run): child privacy, driver self-promotion block, payment write protection, audit log access, admin role provisioning, school auth requirement, driver-child assignment scope
+  - **RLS Integration Tests** (8 tests, run when network available): live Supabase boundary probes for each RLS rule
+  - **Migration File Integrity** (8 tests, always run): verifies all 5 SQL migration files exist with correct content
+
+### ✅ Seed Data
+- [x] `supabase/seed.sql`: 4 Hyderabad pilot schools — DPS Gachibowli, Oakridge International, HPS Begumpet, Glendale Academy
+
+---
+
+## Phase 7 — Admin Operations Dashboard (Completed)
+
+### ✅ Next.js 15 App Router (`apps/admin`)
+- [x] SEO Landing Page (`/`) — Schema.org JSON-LD, meta tags, OG images, sitemap, robots.txt
+- [x] Brand Guidelines v1.0 applied: Navy `#142B4A`, Orange `#F07832`, master logo PNG
+- [x] CMS Portal (`/cms`) — Brand, SEO, Hero, FAQs, Blog, Waitlist Leads tabs
+- [x] Operations Portal — `/dashboard`, `/drivers`, `/routes`, `/schools`, `/bookings`, `/trips`, `/incidents`
+- [x] Blog (`/blog/[slug]`) — Dynamic server-rendered posts
+- [x] Build verified: ✅ `next build` passes — 14 static pages
+
+---
+
+## Deployment Status
+
+### Supabase Project: `orseixsidgyhqrkndxeb`
+| Item | Status | Action Needed |
+|---|---|---|
+| Database schema (5 migrations) | ⚠️ **NOT APPLIED** | Paste `supabase/full_schema_and_seed.sql` into Supabase SQL Editor |
+| Seed data (Hyderabad schools) | ⚠️ **NOT APPLIED** | Included in `full_schema_and_seed.sql` above |
+| Edge Function: `create-razorpay-order` | ⚠️ **NOT DEPLOYED** | `npx supabase functions deploy create-razorpay-order --project-ref orseixsidgyhqrkndxeb` |
+| Edge Function: `razorpay-webhook` | ⚠️ **NOT DEPLOYED** | `npx supabase functions deploy razorpay-webhook --project-ref orseixsidgyhqrkndxeb` |
+| Edge Function: `ai-support-assistant` | ⚠️ **NOT DEPLOYED** | `npx supabase functions deploy ai-support-assistant --project-ref orseixsidgyhqrkndxeb` |
+| Auth config (Phone OTP) | ⚠️ **NOT CONFIGURED** | Enable Phone OTP in Supabase Dashboard → Authentication → Providers → Phone |
+| Storage buckets | ⚠️ **NOT CREATED** | Create `kyc-documents` (private) and `vehicle-photos` (private) buckets |
+
+### Admin Web App: `apps/admin`
+| Item | Status |
+|---|---|
+| Local dev server (`localhost:3000`) | ✅ Running |
+| Next.js build | ✅ 14/14 pages built |
+| Firebase Hosting / Vercel deployment | ⚠️ Not configured |
+
+---
+
+## Environment Variables Required
+
+```bash
+# Mobile apps (Expo)
+EXPO_PUBLIC_SUPABASE_URL=https://orseixsidgyhqrkndxeb.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=<anon_key>
+
+# Admin web (Next.js)
+NEXT_PUBLIC_SUPABASE_URL=https://orseixsidgyhqrkndxeb.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_key>
+
+# Server-side only (Edge Functions, Next.js Server Actions)
+SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
+RAZORPAY_KEY_SECRET=<live_secret>
+RAZORPAY_WEBHOOK_SECRET=<webhook_secret>
+```
+
+---
+
+## Key Security Constraints (Non-Negotiable)
+
+1. **Driver verification is ALWAYS manual** — `driver_status` must stay `UNDER_REVIEW` until an Operations Admin physically reviews documents. No automated approval.
+2. **Child data is private** — Parents can only see their own children. Drivers see only their assigned route children during active trips.
+3. **Payments are server-side only** — No client-side payment confirmation. Orders via Edge Function. Status via HMAC-verified Razorpay webhooks.
+4. **Admin roles cannot be self-provisioned** — `handle_new_user()` trigger enforces `parent`/`driver` only. Admins are provisioned server-side by super admins.
+5. **KYC documents in private buckets only** — Zero public access. Temporary signed URLs for authenticated admins only.
 
 ---
 
 ## Log of Completed Work
 
-1. **System Design & Documentation**:
-   - `docs/IMPLEMENTATION_PLAN.md`: Full 10-phase roadmap with acceptance criteria.
-   - `docs/ARCHITECTURE.md`: High-level C4 diagram, domain ERD, and state machines.
-   - `docs/ASSUMPTIONS.md`: Documented business policies and Telangana RTA transport regulations.
-   - `docs/SECURITY.md`: DPDPA compliance, RLS policy matrix, threat model, child privacy rules.
-   - `docs/PROGRESS.md`: Live tracking log.
+### September 2026 — Phase 1 Foundation
+1. **Monorepo initialized**: pnpm workspaces + Turborepo at project root
+2. **5 shared packages built**: `@tinyride/config`, `@tinyride/types`, `@tinyride/validation`, `@tinyride/ui`, `@tinyride/api-client`
+3. **5 SQL migrations written**: Complete schema, RLS, seat locking RPCs, CMS schema, audit log triggers
+4. **Auth helpers implemented**: Phone OTP + email magic link flows with role resolution
+5. **Database types generated**: `packages/types/src/database.ts` — typed `Database` interface for all 18 tables
+6. **RLS boundary tests written**: 27-test suite covering policy axioms, migration integrity, and live integration probes
+7. **Test suite**: 40/40 passing
 
-2. **Monorepo Foundation & Shared Packages**:
-   - `packages/config`: Central `tsconfig.base.json`.
-   - `packages/types`: Domain interfaces (`Profile`, `Child`, `Driver`, `Vehicle`, `Route`, `Booking`, `Payment`, `Trip`, `TripEvent`, `Incident`, `AuditLog`, `RouteOptimizer`).
-   - `packages/validation`: Zod schemas with Indian mobile number regex, Telangana vehicle registration format, seat limits, and UUID idempotency.
-   - `packages/ui`: Visual identity (Navy `#0F1E36` & Orange `#FF6B00`), currency and distance formatters.
-   - `packages/api-client`: Typed Supabase client and `OfflineTripSyncQueue` with atomic retry and conflict avoidance.
+### September 2026 — Phase 7 Admin Dashboard
+8. **Next.js 15 admin app built**: 14 static routes, full operations portal, CMS desk
+9. **SEO landing page**: Schema.org JSON-LD, sitemap.xml, robots.txt, full meta tags
+10. **Brand Guidelines v1.0 applied**: Official palette, master logo PNG distributed to all apps
 
-3. **Supabase Database & Edge Functions**:
-   - `supabase/migrations/20260921000001_initial_schema.sql`: 18+ core tables with indexes and check constraints.
-   - `supabase/migrations/20260921000002_rls_and_triggers.sql`: RLS enabled on all tables, automated timestamps, auth onboarding triggers.
-   - `supabase/migrations/20260921000003_seat_locking_rpc.sql`: Atomic seat increment/decrement with row-level locks.
-   - `supabase/seed.sql`: Hyderabad pilot schools (DPS Gachibowli, Oakridge, HPS Begumpet, Glendale Academy).
-   - `supabase/functions/create-razorpay-order/`: Order creation Edge Function.
-   - `supabase/functions/razorpay-webhook/`: Cryptographic HMAC-SHA256 signature verification & booking confirmation.
-   - `supabase/functions/ai-support-assistant/`: Constrained LLM assistant with emergency hotline fallback.
-
-4. **Applications Built & Verified**:
-   - `apps/admin`: Next.js 15 App Router production build succeeded (10/10 routes).
-   - `apps/parent`: React Native (Expo Router) mobile app with active trip tracking, child management, route discovery, and Razorpay billing.
-   - `apps/driver`: React Native (Expo Router) mobile app with safety-focused 2-tap milestone buttons, passenger roster, offline event queue, and earnings tracker.
-   - `services/route-optimizer`: Google OR-Tools CVRPTW solver with 100% test coverage.
-
-5. **Automated Verification Executed**:
-   - 13 Vitest unit tests passing across all packages.
-   - Python route optimizer tests passing.
-   - Next.js production build (`apps/admin`) generating all static assets with zero errors.
+### September 2026 — Supporting Work
+11. **Route optimizer**: Python CVRPTW solver in `services/route-optimizer`
+12. **Mobile apps scaffolded**: `apps/parent` (Expo Router), `apps/driver` (Expo Router)
+13. **Edge functions scaffolded**: Razorpay order creation, webhook handling, AI support assistant
