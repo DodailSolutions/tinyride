@@ -19,6 +19,11 @@ import {
   completeDriverTrip,
   fetchDriverEarnings,
   reportDriverIncident,
+  checkDriverAuthorization,
+  fetchDriverRouteConfig,
+  updateDriverRouteTimings,
+  fetchDriverBookingRequests,
+  fetchDriverDailySchedule,
   SEED_DRIVER_ID,
   SEED_ROUTE_ID,
   SEED_VEHICLE_ID,
@@ -337,6 +342,122 @@ describe('Driver App Complete Journey & Compliance Test Suite', () => {
       expect(reported.severity).toBe('HIGH');
       expect(reported.status).toBe('OPEN');
       expect(reported.reported_by).toBe(SEED_DRIVER_ID);
+    });
+  });
+
+  describe('8. Driver Authorization & Approval Checks', () => {
+    it('allows verified driver to initiate trips', async () => {
+      // Ensure driver is verified in store
+      driverMemoryStore.driver.status = 'VERIFIED';
+
+      const auth = await checkDriverAuthorization(SEED_DRIVER_ID);
+      expect(auth.isAuthorized).toBe(true);
+      expect(auth.status).toBe('VERIFIED');
+      expect(auth.canStartTrips).toBe(true);
+      expect(auth.reason).toBeUndefined();
+    });
+
+    it('blocks driver in UNDER_REVIEW status from starting trips', async () => {
+      // Temporarily mark driver as UNDER_REVIEW
+      driverMemoryStore.driver.status = 'UNDER_REVIEW';
+
+      const auth = await checkDriverAuthorization(SEED_DRIVER_ID);
+      expect(auth.canStartTrips).toBe(false);
+      expect(auth.status).toBe('UNDER_REVIEW');
+      expect(auth.reason).toContain('under review');
+
+      // Restore status
+      driverMemoryStore.driver.status = 'VERIFIED';
+    });
+  });
+
+  describe('9. Trip State Transitions & Safety Guard', () => {
+    const validTripUuid = 'c0000000-0000-4000-8000-000000000001';
+    const validChildUuid = 'd0000000-0000-4000-8000-000000000001';
+
+    it('transitions trip status correctly: SCHEDULED -> IN_PROGRESS -> COMPLETED', async () => {
+      // 1. Initial active trip is scheduled
+      const activeState = await fetchDriverActiveTrip(SEED_DRIVER_ID);
+      expect(activeState).toBeDefined();
+
+      // 2. Start trip
+      const started = await startDriverTrip(
+        SEED_DRIVER_ID,
+        SEED_ROUTE_ID,
+        SEED_VEHICLE_ID,
+        'MORNING_PICKUP'
+      );
+      expect(started.status).toBe('IN_PROGRESS');
+      expect(started.actual_start_time).toBeDefined();
+
+      // 3. Record student pickup
+      const pickupEvent = await recordStudentPickup(
+        validTripUuid,
+        validChildUuid,
+        '660e8400-e29b-41d4-a716-446655440001',
+        { latitude: 17.4645, longitude: 78.3582 }
+      );
+      expect(pickupEvent.event_type).toBe('PICKED_UP');
+
+      // 4. Complete trip
+      const completed = await completeDriverTrip(validTripUuid, SEED_DRIVER_ID);
+      expect(completed.status).toBe('COMPLETED');
+      expect(completed.actual_end_time).toBeDefined();
+    });
+  });
+
+  describe('10. Route Configuration, Seat Capacity & Booking Requests', () => {
+    it('retrieves route config with calculated available seats', async () => {
+      const config = await fetchDriverRouteConfig(SEED_DRIVER_ID);
+      expect(config).toBeDefined();
+      if (!config) return;
+
+      expect(config.route.route_name).toContain('Kondapur');
+      expect(config.route.total_capacity).toBe(4);
+      expect(config.route.reserved_seats).toBe(4);
+      expect(config.availableSeats).toBe(0); // 4 - 4 = 0 seats
+      expect(config.stops.length).toBe(4);
+      expect(config.schoolName).toContain('DPS');
+    });
+
+    it('updates driver route timings and availability status', async () => {
+      const updated = await updateDriverRouteTimings(SEED_ROUTE_ID, {
+        morning_start_time: '07:20',
+        morning_arrival_time: '08:20',
+        status: 'ACTIVE',
+      });
+
+      expect(updated.morning_start_time).toBe('07:20');
+      expect(updated.morning_arrival_time).toBe('08:20');
+      expect(updated.status).toBe('ACTIVE');
+    });
+
+    it('retrieves pending and confirmed booking requests on driver route', async () => {
+      const bookings = await fetchDriverBookingRequests(SEED_DRIVER_ID);
+
+      expect(bookings.length).toBeGreaterThanOrEqual(4);
+      expect(bookings[0]?.childName).toBe('Aarav Sharma');
+      expect(bookings[0]?.status).toBe('CONFIRMED');
+      expect(bookings[0]?.monthlyFee).toBe(3200);
+      expect(bookings[0]?.parentPhone).toBe('+919849012345');
+    });
+  });
+
+  describe('11. Daily Shift Schedules & Stop Sequences', () => {
+    it('generates morning and afternoon shift timetables ordered by stop sequence', async () => {
+      const schedule = await fetchDriverDailySchedule(SEED_DRIVER_ID);
+
+      expect(schedule.morningShift.stops.length).toBeGreaterThanOrEqual(3);
+      expect(schedule.morningShift.startTime).toBe('07:15');
+      expect(schedule.morningShift.schoolArrivalTime).toBe('08:15');
+
+      // Verify morning stop ordering
+      const morningSeq = schedule.morningShift.stops.map((s) => s.stopSequence);
+      expect(morningSeq).toEqual([1, 2, 3]);
+
+      // Verify afternoon stop reverse ordering
+      const afternoonSeq = schedule.afternoonShift.stops.map((s) => s.stopSequence);
+      expect(afternoonSeq).toEqual([3, 2, 1]);
     });
   });
 });

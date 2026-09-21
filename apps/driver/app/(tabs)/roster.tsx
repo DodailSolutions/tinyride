@@ -11,7 +11,13 @@ import {
   RefreshControl,
 } from 'react-native';
 import { brandTokens } from '@tinyride/ui';
-import { fetchDriverRoster, RosterPassenger, SEED_DRIVER_ID } from '@tinyride/api-client';
+import {
+  fetchDriverRoster,
+  fetchDriverDailySchedule,
+  RosterPassenger,
+  DriverDailySchedule,
+  SEED_DRIVER_ID,
+} from '@tinyride/api-client';
 import { useAuth } from '../../src/context/AuthContext';
 import { LoadingIndicator, EmptyState, ErrorBanner } from '../../src/components/UIState';
 
@@ -23,17 +29,23 @@ export default function DriverRosterScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [viewMode, setViewMode] = useState<'ROSTER' | 'SCHEDULE'>('ROSTER');
   const [routeName, setRouteName] = useState<string>('');
   const [schoolName, setSchoolName] = useState<string>('');
   const [passengers, setPassengers] = useState<RosterPassenger[]>([]);
+  const [dailySchedule, setDailySchedule] = useState<DriverDailySchedule | null>(null);
 
   const loadRoster = useCallback(async () => {
     try {
       setError(null);
-      const res = await fetchDriverRoster(driverId);
-      setRouteName(res.routeName);
-      setSchoolName(res.schoolName);
-      setPassengers(res.passengers);
+      const [rosterRes, scheduleRes] = await Promise.all([
+        fetchDriverRoster(driverId),
+        fetchDriverDailySchedule(driverId),
+      ]);
+      setRouteName(rosterRes.routeName);
+      setSchoolName(rosterRes.schoolName);
+      setPassengers(rosterRes.passengers);
+      setDailySchedule(scheduleRes);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to fetch passenger roster');
     } finally {
@@ -77,8 +89,29 @@ export default function DriverRosterScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F07832" />}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Assigned Passengers</Text>
-          <Text style={styles.sub}>{schoolName || 'DPS Gachibowli'} • {routeName || 'Morning & Afternoon Roster'}</Text>
+          <Text style={styles.title}>Passengers & Schedules</Text>
+          <Text style={styles.sub}>{schoolName || 'DPS Gachibowli'} • {routeName || 'Morning & Afternoon'}</Text>
+        </View>
+
+        {/* View Mode Segmented Controls */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tabBtn, viewMode === 'ROSTER' && styles.tabBtnActive]}
+            onPress={() => setViewMode('ROSTER')}
+          >
+            <Text style={[styles.tabBtnText, viewMode === 'ROSTER' && styles.tabBtnTextActive]}>
+              Assigned Students ({passengers.length})
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabBtn, viewMode === 'SCHEDULE' && styles.tabBtnActive]}
+            onPress={() => setViewMode('SCHEDULE')}
+          >
+            <Text style={[styles.tabBtnText, viewMode === 'SCHEDULE' && styles.tabBtnTextActive]}>
+              Daily Shift Timetable
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.noticeBox}>
@@ -89,60 +122,127 @@ export default function DriverRosterScreen() {
 
         {error && <ErrorBanner message={error} onRetry={loadRoster} />}
 
-        {passengers.length === 0 ? (
-          <EmptyState
-            icon="🎒"
-            title="No Students Assigned Yet"
-            description="When parents book seats on your route and bookings are confirmed, their stop schedule will appear here."
-            actionLabel="Refresh Roster"
-            onAction={loadRoster}
-          />
+        {viewMode === 'ROSTER' ? (
+          passengers.length === 0 ? (
+            <EmptyState
+              icon="🎒"
+              title="No Students Assigned Yet"
+              description="When parents book seats on your route and bookings are confirmed, their stop schedule will appear here."
+              actionLabel="Refresh Roster"
+              onAction={loadRoster}
+            />
+          ) : (
+            passengers.map((p, index) => (
+              <View key={p.childId} style={styles.card}>
+                <View style={styles.cardTop}>
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>{p.name.substring(0, 2).toUpperCase()}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.name}>{p.name}</Text>
+                    <Text style={styles.grade}>{p.grade} • Stop #{index + 1}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.details}>
+                  <Text style={styles.detailLabel}>Pickup Landmark & Time:</Text>
+                  <Text style={styles.detailVal}>📍 {p.stopName} (⏰ {p.pickupTime})</Text>
+                </View>
+
+                {p.specialInstructions && (
+                  <View style={styles.specialNotesBox}>
+                    <Text style={styles.notesLabel}>Special Care Instruction:</Text>
+                    <Text style={styles.notesVal}>ℹ️ {p.specialInstructions}</Text>
+                  </View>
+                )}
+
+                {p.medicalNotes && (
+                  <View style={styles.medicalBox}>
+                    <Text style={styles.medicalLabel}>Medical / Health Alert:</Text>
+                    <Text style={styles.medicalVal}>🩺 {p.medicalNotes}</Text>
+                  </View>
+                )}
+
+                <View style={styles.cardFooter}>
+                  <View>
+                    <Text style={styles.parentLabel}>Primary Guardian:</Text>
+                    <Text style={styles.parentName}>{p.parentName}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.callBtn}
+                    onPress={() => handleCallParent(p.parentPhone, p.parentName)}
+                  >
+                    <Text style={styles.callBtnText}>📞 Call {p.parentPhone}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))
+          )
         ) : (
-          passengers.map((p, index) => (
-            <View key={p.childId} style={styles.card}>
-              <View style={styles.cardTop}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{p.name.substring(0, 2).toUpperCase()}</Text>
+          /* Daily Shift Schedule Timeline */
+          <View style={styles.timelineArea}>
+            {/* Morning Shift */}
+            <View style={styles.shiftHeaderCard}>
+              <View style={styles.shiftBadgeRow}>
+                <View style={styles.morningBadge}>
+                  <Text style={styles.morningBadgeText}>MORNING COMMUTE</Text>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.name}>{p.name}</Text>
-                  <Text style={styles.grade}>{p.grade} • Stop #{index + 1}</Text>
-                </View>
-              </View>
-
-              <View style={styles.details}>
-                <Text style={styles.detailLabel}>Pickup Landmark & Time:</Text>
-                <Text style={styles.detailVal}>📍 {p.stopName} (⏰ {p.pickupTime})</Text>
-              </View>
-
-              {p.specialInstructions && (
-                <View style={styles.specialNotesBox}>
-                  <Text style={styles.notesLabel}>Special Care Instruction:</Text>
-                  <Text style={styles.notesVal}>ℹ️ {p.specialInstructions}</Text>
-                </View>
-              )}
-
-              {p.medicalNotes && (
-                <View style={styles.medicalBox}>
-                  <Text style={styles.medicalLabel}>Medical / Health Alert:</Text>
-                  <Text style={styles.medicalVal}>🩺 {p.medicalNotes}</Text>
-                </View>
-              )}
-
-              <View style={styles.cardFooter}>
-                <View>
-                  <Text style={styles.parentLabel}>Primary Guardian:</Text>
-                  <Text style={styles.parentName}>{p.parentName}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.callBtn}
-                  onPress={() => handleCallParent(p.parentPhone, p.parentName)}
-                >
-                  <Text style={styles.callBtnText}>📞 Call {p.parentPhone}</Text>
-                </TouchableOpacity>
+                <Text style={styles.shiftSummaryTime}>
+                  Starts {dailySchedule?.morningShift.startTime} ➔ School Bell {dailySchedule?.morningShift.schoolArrivalTime}
+                </Text>
               </View>
             </View>
-          ))
+
+            {dailySchedule?.morningShift.stops.map((stop) => (
+              <View key={`m-${stop.stopSequence}`} style={styles.timelineItem}>
+                <View style={styles.timelineDot} />
+                <View style={styles.timelineContent}>
+                  <View style={styles.timelineTop}>
+                    <Text style={styles.timelineTime}>⏰ {stop.scheduledTime}</Text>
+                    <Text style={styles.timelineSeq}>Stop #{stop.stopSequence}</Text>
+                  </View>
+                  <Text style={styles.timelineStopName}>{stop.stopName}</Text>
+                  <Text style={styles.timelineStudents}>
+                    Students Boarding: {stop.studentNames.join(', ')}
+                  </Text>
+                </View>
+              </View>
+            ))}
+
+            <View style={styles.schoolGateCard}>
+              <Text style={styles.schoolGateText}>
+                🏫 08:15 AM — School Gate Arrival & Student Handover ({dailySchedule?.morningShift.schoolName})
+              </Text>
+            </View>
+
+            {/* Afternoon Shift */}
+            <View style={[styles.shiftHeaderCard, { marginTop: 24 }]}>
+              <View style={styles.shiftBadgeRow}>
+                <View style={styles.afternoonBadge}>
+                  <Text style={styles.afternoonBadgeText}>AFTERNOON COMMUTE</Text>
+                </View>
+                <Text style={styles.shiftSummaryTime}>
+                  Departs Gate {dailySchedule?.afternoonShift.schoolPickupTime} ➔ Final Drop {dailySchedule?.afternoonShift.endTime}
+                </Text>
+              </View>
+            </View>
+
+            {dailySchedule?.afternoonShift.stops.map((stop) => (
+              <View key={`a-${stop.stopSequence}`} style={styles.timelineItem}>
+                <View style={[styles.timelineDot, { backgroundColor: '#38BDF8' }]} />
+                <View style={styles.timelineContent}>
+                  <View style={styles.timelineTop}>
+                    <Text style={styles.timelineTime}>⏰ {stop.scheduledTime}</Text>
+                    <Text style={styles.timelineSeq}>Stop #{stop.stopSequence}</Text>
+                  </View>
+                  <Text style={styles.timelineStopName}>{stop.stopName}</Text>
+                  <Text style={styles.timelineStudents}>
+                    Students Dropping: {stop.studentNames.join(', ')}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -155,6 +255,31 @@ const styles = StyleSheet.create({
   header: { marginBottom: 14 },
   title: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
   sub: { fontSize: 12, color: brandTokens.warmOrange, marginTop: 3, fontWeight: '600' },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+  },
+  tabBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  tabBtnActive: {
+    backgroundColor: brandTokens.warmOrange,
+  },
+  tabBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#94A3B8',
+  },
+  tabBtnTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+  },
   noticeBox: {
     backgroundColor: '#142B4A',
     padding: 12,
@@ -225,4 +350,51 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
   },
   callBtnText: { color: brandTokens.warmOrange, fontWeight: '700', fontSize: 11 },
+  timelineArea: { gap: 8, marginBottom: 20 },
+  shiftHeaderCard: {
+    backgroundColor: '#142B4A',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+    marginBottom: 6,
+  },
+  shiftBadgeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  morningBadge: { backgroundColor: '#064E3B', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  morningBadgeText: { fontSize: 10, fontWeight: '800', color: '#6EE7B7' },
+  afternoonBadge: { backgroundColor: '#1E3A8A', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  afternoonBadgeText: { fontSize: 10, fontWeight: '800', color: '#93C5FD' },
+  shiftSummaryTime: { fontSize: 11, fontWeight: '700', color: '#CBD5E1' },
+  timelineItem: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'flex-start',
+    backgroundColor: '#142B4A',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#1E3A5F',
+  },
+  timelineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#10B981',
+    marginTop: 4,
+  },
+  timelineContent: { flex: 1 },
+  timelineTop: { flexDirection: 'row', justifyContent: 'space-between' },
+  timelineTime: { fontSize: 12, fontWeight: '800', color: brandTokens.warmOrange },
+  timelineSeq: { fontSize: 10, fontWeight: '700', color: '#94A3B8' },
+  timelineStopName: { fontSize: 13, fontWeight: '700', color: '#FFFFFF', marginTop: 2 },
+  timelineStudents: { fontSize: 11, color: '#CBD5E1', marginTop: 3 },
+  schoolGateCard: {
+    backgroundColor: '#064E3B',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#047857',
+    marginTop: 4,
+  },
+  schoolGateText: { fontSize: 12, fontWeight: '800', color: '#E2E8F0', textAlign: 'center' },
 });

@@ -17,6 +17,8 @@ import {
   recordStudentPickup,
   recordStudentAbsent,
   completeDriverTrip,
+  checkDriverAuthorization,
+  DriverAuthStatus,
   RosterPassenger,
   SEED_DRIVER_ID,
   SEED_ROUTE_ID,
@@ -51,10 +53,20 @@ export default function DriverTripScreen() {
   const [offlinePendingCount, setOfflinePendingCount] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
 
+  // Safety & Approval Checks
+  const [authStatus, setAuthStatus] = useState<DriverAuthStatus | null>(null);
+  const [isVehicleStationary, setIsVehicleStationary] = useState<boolean>(true);
+
   const loadTripData = useCallback(async () => {
     try {
       setError(null);
-      const tripState = await fetchDriverActiveTrip(driverId);
+      const [tripState, authRes] = await Promise.all([
+        fetchDriverActiveTrip(driverId),
+        checkDriverAuthorization(driverId),
+      ]);
+
+      setAuthStatus(authRes);
+
       if (tripState) {
         setActiveTrip(tripState.trip);
         setPassengers(tripState.passengers);
@@ -96,6 +108,14 @@ export default function DriverTripScreen() {
   };
 
   const handleStartTrip = async () => {
+    if (authStatus && !authStatus.canStartTrips) {
+      Alert.alert(
+        'Verification Required',
+        authStatus.reason || 'Account under review. Trips cannot be started until documents are physically verified by Dodail Operations.'
+      );
+      return;
+    }
+
     try {
       const routeId = activeTrip?.route_id || SEED_ROUTE_ID;
       const vehicleId = activeTrip?.vehicle_id || SEED_VEHICLE_ID;
@@ -122,6 +142,14 @@ export default function DriverTripScreen() {
   };
 
   const handleRecordPickup = async (childId: string, stopName: string) => {
+    if (!isVehicleStationary) {
+      Alert.alert(
+        'Safety Driving Lock Active',
+        'DO NOT USE SCREEN WHILE DRIVING. Pull over and halt vehicle completely before recording boarding.'
+      );
+      return;
+    }
+
     const idempotencyKey = `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     // Immediate optimistic UI update
@@ -281,6 +309,44 @@ export default function DriverTripScreen() {
         contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F07832" />}
       >
+        {/* Driver Approval Barrier */}
+        {authStatus && !authStatus.canStartTrips && (
+          <View style={styles.barrierCard}>
+            <Text style={styles.barrierTitle}>🛡️ Verification Required</Text>
+            <Text style={styles.barrierDesc}>
+              {authStatus.reason ||
+                'Your driver profile is currently UNDER REVIEW. School commute trips cannot be started until commercial documents are verified by Dodail Operations.'}
+            </Text>
+          </View>
+        )}
+
+        {/* Safe Driving Motion Guard */}
+        {isTripActive && (
+          <View style={[styles.motionBar, !isVehicleStationary && styles.motionBarMoving]}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.motionStatus}>
+                {isVehicleStationary ? '🛑 Vehicle Stationary at Stop' : '🚗 Vehicle in Motion'}
+              </Text>
+              <Text style={styles.motionSub}>
+                {isVehicleStationary
+                  ? 'Safe to record passenger boarding.'
+                  : 'DO NOT USE SCREEN WHILE DRIVING. Halt vehicle completely to log stops.'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={[
+                styles.motionToggleBtn,
+                isVehicleStationary ? styles.motionHaltedBtn : styles.motionDriveBtn,
+              ]}
+              onPress={() => setIsVehicleStationary((prev) => !prev)}
+            >
+              <Text style={styles.motionToggleText}>
+                {isVehicleStationary ? 'Simulate Moving' : 'Vehicle Halted'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Trip Summary Card */}
         <View style={styles.tripSummaryCard}>
           <View style={styles.summaryRow}>
@@ -299,8 +365,17 @@ export default function DriverTripScreen() {
           </View>
 
           {!isTripActive ? (
-            <TouchableOpacity style={styles.startTripButton} onPress={handleStartTrip}>
-              <Text style={styles.startTripButtonText}>START MORNING TRIP</Text>
+            <TouchableOpacity
+              style={[
+                styles.startTripButton,
+                (!authStatus?.canStartTrips || isTripActive) && styles.disabledTripButton,
+              ]}
+              onPress={handleStartTrip}
+              disabled={!authStatus?.canStartTrips}
+            >
+              <Text style={styles.startTripButtonText}>
+                {authStatus?.canStartTrips ? 'START MORNING TRIP' : 'TRIP LOCKED (KYC PENDING)'}
+              </Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.endTripButton} onPress={handleEndTrip}>
@@ -526,4 +601,72 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   absentButtonText: { color: '#94A3B8', fontSize: 10, fontWeight: '700' },
+  disabledTripButton: {
+    backgroundColor: '#334155',
+    opacity: 0.7,
+  },
+  barrierCard: {
+    backgroundColor: '#451A03',
+    borderColor: '#78350F',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 14,
+  },
+  barrierTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FDE68A',
+  },
+  barrierDesc: {
+    fontSize: 12,
+    color: '#FEF3C7',
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  motionBar: {
+    backgroundColor: '#064E3B',
+    borderColor: '#047857',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  motionBarMoving: {
+    backgroundColor: '#450A0A',
+    borderColor: '#991B1B',
+  },
+  motionStatus: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  motionSub: {
+    fontSize: 11,
+    color: '#E2E8F0',
+    marginTop: 2,
+  },
+  motionToggleBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  motionHaltedBtn: {
+    backgroundColor: '#065F46',
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  motionDriveBtn: {
+    backgroundColor: '#7F1D1D',
+    borderWidth: 1,
+    borderColor: '#EF4444',
+  },
+  motionToggleText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
 });

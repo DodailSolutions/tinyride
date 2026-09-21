@@ -29,6 +29,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="route"
+        options={{
+          title: 'Route & Seats',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 18 }}>🗺️</Text>,
+        }}
+      />
+      <Tabs.Screen
         name="roster"
         options={{
           title: 'Passengers',

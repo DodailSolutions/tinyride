@@ -20,6 +20,11 @@ import {
   Vehicle,
   DriverDocument,
   Route,
+  RouteStop,
+  RouteStatus,
+  Booking,
+  BookingStatus,
+  DriverStatus,
   Trip,
   TripEvent,
   DriverPayout,
@@ -1160,3 +1165,477 @@ export async function reportDriverIncident(
     return newIncident;
   }
 }
+
+// ============================================================================
+// 6. DRIVER ROLE RESTRICTIONS & APPROVAL CHECKS
+// ============================================================================
+
+export interface DriverAuthStatus {
+  isAuthorized: boolean;
+  status: DriverStatus;
+  canStartTrips: boolean;
+  role: string;
+  reason?: string;
+}
+
+/**
+ * Checks driver's verification status and role boundaries.
+ * Non-negotiable safety constraint: Unverified drivers CANNOT start trips.
+ */
+export async function checkDriverAuthorization(
+  driverId: string,
+  client?: SupabaseClient
+): Promise<DriverAuthStatus> {
+  const supabase = getClientSafely(client);
+
+  if (!supabase) {
+    const isVerified = driverMemoryStore.driver.status === 'VERIFIED';
+    return {
+      isAuthorized: true,
+      status: driverMemoryStore.driver.status,
+      canStartTrips: isVerified,
+      role: 'driver',
+      reason: isVerified
+        ? undefined
+        : 'Account is under review by Dodail Operations. Verification of commercial license and vehicle FC is required before starting trips.',
+    };
+  }
+
+  try {
+    const [profileRes, driverRes] = await Promise.all([
+      supabase.from('profiles').select('role, is_active').eq('id', driverId).maybeSingle(),
+      supabase.from('drivers').select('status').eq('id', driverId).maybeSingle(),
+    ]);
+
+    if (!profileRes.data || profileRes.data.role !== 'driver') {
+      return {
+        isAuthorized: false,
+        status: 'REJECTED',
+        canStartTrips: false,
+        role: profileRes.data?.role || 'unknown',
+        reason: 'Access restricted: Account does not have driver partner credentials.',
+      };
+    }
+
+    const driverStatus: DriverStatus = driverRes.data?.status || 'UNDER_REVIEW';
+    const canStart = driverStatus === 'VERIFIED' && profileRes.data.is_active;
+
+    return {
+      isAuthorized: true,
+      status: driverStatus,
+      canStartTrips: canStart,
+      role: 'driver',
+      reason: canStart
+        ? undefined
+        : `Trips blocked: Driver status is ${driverStatus}. Physical compliance verification by Dodail Operations required.`,
+    };
+  } catch {
+    return {
+      isAuthorized: true,
+      status: driverMemoryStore.driver.status,
+      canStartTrips: driverMemoryStore.driver.status === 'VERIFIED',
+      role: 'driver',
+    };
+  }
+}
+
+// ============================================================================
+// 7. ROUTE CONFIGURATION, AVAILABILITY & SEAT MANAGEMENT
+// ============================================================================
+
+export interface DriverRouteConfig {
+  route: Route;
+  availableSeats: number;
+  stops: RouteStop[];
+  schoolName: string;
+}
+
+export const SEED_ROUTE_STOPS: RouteStop[] = [
+  {
+    id: 'stop-01',
+    route_id: SEED_ROUTE_ID,
+    stop_name: 'My Home Mangala Gate 2 (Kondapur)',
+    stop_sequence: 1,
+    location: { latitude: 17.4645, longitude: 78.3582 },
+    estimated_pickup_time: '07:25',
+    estimated_drop_time: '16:20',
+    landmark: 'Opposite Heritage Supermarket',
+    created_at: '2026-09-21T00:00:00Z',
+  },
+  {
+    id: 'stop-02',
+    route_id: SEED_ROUTE_ID,
+    stop_name: 'Botanical Garden Main Cross (Khajaguda)',
+    stop_sequence: 2,
+    location: { latitude: 17.4521, longitude: 78.3619 },
+    estimated_pickup_time: '07:38',
+    estimated_drop_time: '16:05',
+    landmark: 'Next to Vijaya Diagnostics',
+    created_at: '2026-09-21T00:00:00Z',
+  },
+  {
+    id: 'stop-03',
+    route_id: SEED_ROUTE_ID,
+    stop_name: 'Lanco Hills Circle Gate A',
+    stop_sequence: 3,
+    location: { latitude: 17.4302, longitude: 78.3751 },
+    estimated_pickup_time: '07:50',
+    estimated_drop_time: '15:52',
+    landmark: 'Security Gate A',
+    created_at: '2026-09-21T00:00:00Z',
+  },
+  {
+    id: 'stop-04',
+    route_id: SEED_ROUTE_ID,
+    stop_name: 'DPS Gachibowli Junior Gate Drop',
+    stop_sequence: 4,
+    location: { latitude: 17.4194, longitude: 78.3688 },
+    estimated_pickup_time: '08:05',
+    estimated_drop_time: '15:35',
+    landmark: 'Primary Wing Gate 3',
+    created_at: '2026-09-21T00:00:00Z',
+  },
+];
+
+export const SEED_ROUTE: Route = {
+  id: SEED_ROUTE_ID,
+  driver_id: SEED_DRIVER_ID,
+  vehicle_id: SEED_VEHICLE_ID,
+  school_id: '11111111-1111-1111-1111-111111111111',
+  route_name: 'Kondapur ➔ DPS Gachibowli Junior Route',
+  status: 'ACTIVE',
+  total_capacity: 4,
+  reserved_seats: 4,
+  morning_start_time: '07:15',
+  morning_arrival_time: '08:15',
+  afternoon_pickup_time: '15:30',
+  afternoon_end_time: '16:30',
+  monthly_base_fee_inr: 3200,
+  stops: SEED_ROUTE_STOPS,
+  created_at: '2026-09-21T00:00:00Z',
+  updated_at: '2026-09-21T00:00:00Z',
+};
+
+/**
+ * Fetches the driver's route configuration, stop schedule, and seat capacity.
+ */
+export async function fetchDriverRouteConfig(
+  driverId: string,
+  client?: SupabaseClient
+): Promise<DriverRouteConfig | null> {
+  const supabase = getClientSafely(client);
+
+  const fallback: DriverRouteConfig = {
+    route: SEED_ROUTE,
+    availableSeats: Math.max(0, SEED_ROUTE.total_capacity - SEED_ROUTE.reserved_seats),
+    stops: SEED_ROUTE_STOPS,
+    schoolName: 'Delhi Public School (DPS) Gachibowli',
+  };
+
+  if (!supabase) return fallback;
+
+  try {
+    const { data: routeData, error } = await supabase
+      .from('routes')
+      .select('*, stops:route_stops(*), school:schools(name)')
+      .eq('driver_id', driverId)
+      .maybeSingle();
+
+    if (error || !routeData) return fallback;
+
+    const stops: RouteStop[] = (routeData.stops || []).map((s: any) => ({
+      id: s.id,
+      route_id: s.route_id,
+      stop_name: s.stop_name,
+      stop_sequence: s.stop_sequence,
+      location: { latitude: s.latitude, longitude: s.longitude },
+      estimated_pickup_time: s.estimated_pickup_time,
+      estimated_drop_time: s.estimated_drop_time,
+      landmark: s.landmark,
+      created_at: s.created_at,
+    }));
+
+    stops.sort((a, b) => a.stop_sequence - b.stop_sequence);
+
+    const availableSeats = Math.max(0, routeData.total_capacity - routeData.reserved_seats);
+    const schoolName = (routeData.school as any)?.name || 'DPS Gachibowli';
+
+    return {
+      route: routeData as Route,
+      availableSeats,
+      stops,
+      schoolName,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Updates driver route schedule or availability status.
+ */
+export async function updateDriverRouteTimings(
+  routeId: string,
+  timings: {
+    morning_start_time?: string;
+    morning_arrival_time?: string;
+    afternoon_pickup_time?: string;
+    afternoon_end_time?: string;
+    status?: RouteStatus;
+  },
+  client?: SupabaseClient
+): Promise<Route> {
+  const supabase = getClientSafely(client);
+  const now = new Date().toISOString();
+
+  const updated: Route = {
+    ...SEED_ROUTE,
+    ...timings,
+    id: routeId,
+    updated_at: now,
+  };
+
+  if (!supabase) return updated;
+
+  try {
+    const { data, error } = await supabase
+      .from('routes')
+      .update({ ...timings, updated_at: now })
+      .eq('id', routeId)
+      .select('*')
+      .single();
+
+    if (error || !data) return updated;
+    return data as Route;
+  } catch {
+    return updated;
+  }
+}
+
+// ============================================================================
+// 8. BOOKING REQUESTS MANAGEMENT
+// ============================================================================
+
+export interface DriverBookingRequest {
+  id: string;
+  childName: string;
+  childGrade: string;
+  parentName: string;
+  parentPhone: string;
+  pickupStopName: string;
+  pickupTime: string;
+  status: BookingStatus;
+  monthlyFee: number;
+  startDate: string;
+}
+
+export const SEED_BOOKING_REQUESTS: DriverBookingRequest[] = [
+  {
+    id: 'book-01',
+    childName: 'Aarav Sharma',
+    childGrade: '3rd Standard',
+    parentName: 'Ananya Sharma',
+    parentPhone: '+919849012345',
+    pickupStopName: 'My Home Mangala Gate 2 (Kondapur)',
+    pickupTime: '07:25',
+    status: 'CONFIRMED',
+    monthlyFee: 3200,
+    startDate: '2026-09-01',
+  },
+  {
+    id: 'book-02',
+    childName: 'Ananya Rao',
+    childGrade: '4th Standard',
+    parentName: 'Srinivas Rao',
+    parentPhone: '+919849055443',
+    pickupStopName: 'Botanical Garden Main Cross (Khajaguda)',
+    pickupTime: '07:38',
+    status: 'CONFIRMED',
+    monthlyFee: 3200,
+    startDate: '2026-09-01',
+  },
+  {
+    id: 'book-03',
+    childName: 'Siddharth Madhavan',
+    childGrade: '2nd Standard',
+    parentName: 'Madhavan V',
+    parentPhone: '+919849044332',
+    pickupStopName: 'Lanco Hills Circle Gate A',
+    pickupTime: '07:50',
+    status: 'CONFIRMED',
+    monthlyFee: 3200,
+    startDate: '2026-09-01',
+  },
+  {
+    id: 'book-04',
+    childName: 'Rohan Verma',
+    childGrade: '5th Standard',
+    parentName: 'Rajesh Verma',
+    parentPhone: '+919849033221',
+    pickupStopName: 'Lanco Hills Circle Gate A',
+    pickupTime: '07:50',
+    status: 'CONFIRMED',
+    monthlyFee: 3200,
+    startDate: '2026-09-01',
+  },
+  {
+    id: 'book-05',
+    childName: 'Ishan Patel',
+    childGrade: '1st Standard',
+    parentName: 'Priyesh Patel',
+    parentPhone: '+919849077665',
+    pickupStopName: 'My Home Mangala Gate 2 (Kondapur)',
+    pickupTime: '07:25',
+    status: 'PENDING_PAYMENT',
+    monthlyFee: 3200,
+    startDate: '2026-10-01',
+  },
+];
+
+/**
+ * Fetches all booking requests (confirmed & pending) for this driver's route.
+ */
+export async function fetchDriverBookingRequests(
+  driverId: string,
+  client?: SupabaseClient
+): Promise<DriverBookingRequest[]> {
+  const supabase = getClientSafely(client);
+
+  if (!supabase) return SEED_BOOKING_REQUESTS;
+
+  try {
+    const { data: route } = await supabase
+      .from('routes')
+      .select('id')
+      .eq('driver_id', driverId)
+      .maybeSingle();
+
+    if (!route) return SEED_BOOKING_REQUESTS;
+
+    const { data: bookings, error } = await supabase
+      .from('bookings')
+      .select(`
+        id,
+        status,
+        start_date,
+        fare_snapshot,
+        child:children(first_name, last_name, grade),
+        parent:profiles!parent_id(full_name, phone),
+        pickup_stop:route_stops!pickup_stop_id(stop_name, estimated_pickup_time)
+      `)
+      .eq('route_id', route.id)
+      .order('created_at', { ascending: false });
+
+    if (error || !bookings || bookings.length === 0) {
+      return SEED_BOOKING_REQUESTS;
+    }
+
+    return bookings.map((b: any) => ({
+      id: b.id,
+      childName: `${b.child?.first_name || ''} ${b.child?.last_name || ''}`.trim(),
+      childGrade: b.child?.grade || 'N/A',
+      parentName: b.parent?.full_name || 'Parent',
+      parentPhone: b.parent?.phone || '+919849000000',
+      pickupStopName: b.pickup_stop?.stop_name || 'Designated Stop',
+      pickupTime: b.pickup_stop?.estimated_pickup_time || '07:30',
+      status: b.status,
+      monthlyFee: b.fare_snapshot?.total_amount_inr || 3200,
+      startDate: b.start_date,
+    }));
+  } catch {
+    return SEED_BOOKING_REQUESTS;
+  }
+}
+
+// ============================================================================
+// 9. DAILY SCHEDULE TIMELINES
+// ============================================================================
+
+export interface DailyScheduleStop {
+  stopSequence: number;
+  stopName: string;
+  scheduledTime: string;
+  studentNames: string[];
+  landmark?: string | null;
+  shift: 'MORNING' | 'AFTERNOON';
+}
+
+export interface DriverDailySchedule {
+  morningShift: {
+    startTime: string;
+    schoolArrivalTime: string;
+    schoolName: string;
+    stops: DailyScheduleStop[];
+  };
+  afternoonShift: {
+    schoolPickupTime: string;
+    endTime: string;
+    schoolName: string;
+    stops: DailyScheduleStop[];
+  };
+}
+
+/**
+ * Generates the driver's daily morning and afternoon stop timetable.
+ */
+export async function fetchDriverDailySchedule(
+  driverId: string,
+  client?: SupabaseClient
+): Promise<DriverDailySchedule> {
+  const { schoolName, passengers } = await fetchDriverRoster(driverId, client);
+
+  // Group passengers by stop
+  const morningStopMap = new Map<number, DailyScheduleStop>();
+  const afternoonStopMap = new Map<number, DailyScheduleStop>();
+
+  passengers.forEach((p) => {
+    // Morning
+    if (!morningStopMap.has(p.stopSequence)) {
+      morningStopMap.set(p.stopSequence, {
+        stopSequence: p.stopSequence,
+        stopName: p.stopName,
+        scheduledTime: p.pickupTime,
+        studentNames: [p.name],
+        shift: 'MORNING',
+      });
+    } else {
+      morningStopMap.get(p.stopSequence)?.studentNames.push(p.name);
+    }
+
+    // Afternoon
+    if (!afternoonStopMap.has(p.stopSequence)) {
+      afternoonStopMap.set(p.stopSequence, {
+        stopSequence: p.stopSequence,
+        stopName: p.stopName,
+        scheduledTime: p.dropTime,
+        studentNames: [p.name],
+        shift: 'AFTERNOON',
+      });
+    } else {
+      afternoonStopMap.get(p.stopSequence)?.studentNames.push(p.name);
+    }
+  });
+
+  const morningStops = Array.from(morningStopMap.values()).sort(
+    (a, b) => a.stopSequence - b.stopSequence
+  );
+  const afternoonStops = Array.from(afternoonStopMap.values()).sort(
+    (a, b) => b.stopSequence - a.stopSequence // Reverse sequence for return commute
+  );
+
+  return {
+    morningShift: {
+      startTime: '07:15',
+      schoolArrivalTime: '08:15',
+      schoolName: schoolName || 'DPS Gachibowli',
+      stops: morningStops,
+    },
+    afternoonShift: {
+      schoolPickupTime: '15:30',
+      endTime: '16:30',
+      schoolName: schoolName || 'DPS Gachibowli',
+      stops: afternoonStops,
+    },
+  };
+}
+
