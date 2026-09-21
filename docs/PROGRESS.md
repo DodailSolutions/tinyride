@@ -18,7 +18,7 @@
 | **Phase 4** | Route Configuration, Discovery & Seat Booking | 🟢 Completed | 100% | Real route discovery, capacity checks, immutable fare snapshots, atomic seat reservation via RPC |
 | **Phase 5** | Razorpay Payments & Subscriptions | 🟢 Completed | 80% | In-app checkout flow, UUID idempotency keys, invoice receipts, booking status transition to CONFIRMED |
 | **Phase 6** | Driver Trip Execution, Offline Sync & Milestones | 🟢 Completed | 100% | `apps/driver` complete MVP: Two-tap trip execution, motion safety guard, route & seat management, booking requests, daily shift timetable, offline sync queue with UUID idempotency, 79/79 tests |
-| **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 14 static routes built, live trip monitor, safety incident desk |
+| **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 11 operational modules + CMS, 19 static routes built, role-scoped security (`operations_admin`), 86/86 tests |
 | **Phase 8** | Google OR-Tools Route Optimization | 🟡 Scaffolded | 70% | `services/route-optimizer` CVRPTW solver implemented and tested |
 | **Phase 9** | AI Support Assistant & Assistive OCR | 🟡 Scaffolded | 30% | Edge Function `ai-support-assistant` scaffolded |
 | **Phase 10** | Security Hardening & App Store Readiness | 🔴 Not Started | 5% | Bundle IDs defined in ARCHITECTURE.md, EAS config pending |
@@ -97,13 +97,24 @@
 
 ## Phase 7 — Admin Operations Dashboard (Completed)
 
-### ✅ Next.js 15 App Router (`apps/admin`)
-- [x] SEO Landing Page (`/`) — Schema.org JSON-LD, meta tags, OG images, sitemap, robots.txt
-- [x] Brand Guidelines v1.0 applied: Navy `#142B4A`, Orange `#F07832`, master logo PNG
-- [x] CMS Portal (`/cms`) — Brand, SEO, Hero, FAQs, Blog, Waitlist Leads tabs
-- [x] Operations Portal — `/dashboard`, `/drivers`, `/routes`, `/schools`, `/bookings`, `/trips`, `/incidents`
-- [x] Blog (`/blog/[slug]`) — Dynamic server-rendered posts
-- [x] Build verified: ✅ `next build` passes — 14 static pages
+### ✅ Next.js 15 App Router (`apps/admin`) — 11 Operational Modules + CMS
+- [x] **SEO Landing Page (`/`)**: Schema.org JSON-LD, meta tags, OpenGraph, sitemap.xml, robots.txt.
+- [x] **Overview Dashboard (`/dashboard`)**: KPI cards (active trips, revenue, open incidents, verified drivers, pending KYC).
+- [x] **Driver & KYC Desk (`/drivers`)**: Review driver applications, verify DL / FC / PCC credentials, approve/reject mutations with audit trail.
+- [x] **Vehicle Review & Capacity Desk (`/vehicles`)**: Telangana commercial plate validation (TS plates), seating compliance (Auto ≤ 6, Van ≤ 14), FC/RC expiry audit.
+- [x] **Parent & Student Management (`/parents`)**: Emergency contact directory, enrolled children, grade/school/route breakdown, commute subscriptions.
+- [x] **Schools Directory (`/schools`)**: Hyderabad pilot schools, gate locations, morning/afternoon bell schedules, contact coordinators.
+- [x] **Routes & Capacity (`/routes`)**: Pickup/drop stop sequences, morning/afternoon timing windows, reserved vs available seat capacity counters.
+- [x] **Bookings Management (`/bookings`)**: Term subscriptions, booking lifecycle states, student allocation.
+- [x] **Payments & Financial Ledger (`/payments`)**: Razorpay payment & order tracking, gross collections, fixed 10% Dodail platform fee, 90% driver payout reconciliation.
+- [x] **Live Trip Monitor (`/trips`)**: Real-time vehicle location tracking, milestone event progression (DEPARTED, AT_STOP, COMPLETED), student boarding statuses.
+- [x] **Safety & Emergency Incidents (`/incidents`)**: Incident severity triage, driver vehicle breakdowns, admin resolution workflow with resolution notes.
+- [x] **Support Desk (`/support`)**: Parent & driver inquiries, priority-based triage (`LOW`, `MEDIUM`, `HIGH`, `URGENT`), ticket resolution desk with audit logging.
+- [x] **Immutable Security Audit Logs (`/audit-logs`)**: Append-only audit records, actor role badges, IP address, user agent, and full JSON payload diff inspection.
+- [x] **CMS Portal (`/cms`)**: Brand settings, Hero copy, FAQs, Blog posts, and waitlist leads management.
+- [x] **Dynamic Blog (`/blog/[slug]`)**: Server-rendered safety and commute articles.
+- [x] **Role-Scoped Security**: Strict `assertAdminRole` boundary checks (`operations_admin`, `super_admin`), server-side validated privileged mutations, automated immutable audit logging.
+- [x] **Build & Tests**: ✅ `next build` passes — 19/19 pages built; **86/86 unit & integration tests passing** (`pnpm test`).
 
 ---
 
