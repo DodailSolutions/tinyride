@@ -13,10 +13,10 @@
 | Phase | Description | Status | Progress | Highlights |
 |---|---|---|---|---|
 | **Phase 1** | Monorepo Setup, Shared Packages, Supabase DB & RLS | 🟢 Completed | 100% | pnpm monorepo, 5 packages, 5 DB migrations, RLS on 18 tables, audit log triggers, typed DB schema, auth helpers, 40/40 tests |
-| **Phase 2** | Parent Profile, Multiple Children & Schools | 🟡 Scaffolded | 40% | `apps/parent` Expo Router app scaffolded with child profiles, guardian setup, Hyderabad schools |
+| **Phase 2** | Parent Profile, Multiple Children & Schools | 🟢 Completed | 100% | `apps/parent` production MVP: Phone OTP auth, multi-child profiles, Hyderabad school selector, route discovery, atomic seat reservations, in-app payments, 54/54 tests |
 | **Phase 3** | Driver Onboarding, Documents & Admin KYC | 🟡 Scaffolded | 40% | `apps/admin` KYC Desk with Telangana DL/FC/PCC auditing & approve/reject workflows |
-| **Phase 4** | Route Configuration, Discovery & Seat Booking | 🟡 Scaffolded | 30% | Route discovery screen, capacity checks, immutable fare snapshots, atomic seat locking RPC |
-| **Phase 5** | Razorpay Payments & Subscriptions | 🟡 Scaffolded | 30% | Edge Functions (`create-razorpay-order`, `razorpay-webhook`) scaffolded, HMAC verification logic written |
+| **Phase 4** | Route Configuration, Discovery & Seat Booking | 🟢 Completed | 100% | Real route discovery, capacity checks, immutable fare snapshots, atomic seat reservation via RPC |
+| **Phase 5** | Razorpay Payments & Subscriptions | 🟢 Completed | 80% | In-app checkout flow, UUID idempotency keys, invoice receipts, booking status transition to CONFIRMED |
 | **Phase 6** | Driver Trip Execution, Offline Sync & Milestones | 🟡 Scaffolded | 30% | `apps/driver` Expo Router app scaffolded, two-tap trip execution, UUID idempotency keys, offline sync queue |
 | **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 14 static routes built, live trip monitor, safety incident desk |
 | **Phase 8** | Google OR-Tools Route Optimization | 🟡 Scaffolded | 70% | `services/route-optimizer` CVRPTW solver implemented and tested |
@@ -179,4 +179,16 @@ RAZORPAY_WEBHOOK_SECRET=<webhook_secret>
 12. **Mobile apps scaffolded & typechecked**: `apps/parent` (Expo Router) and `apps/driver` (Expo Router) with zero TypeScript errors
 13. **Mobile Brand alignment**: Pinned local React 18 types in tsconfigs, eliminated HTML `<div>` syntax in favor of React Native `<View>`, and aligned all mobile layouts & `app.json` to Brand Guidelines v1.0 design tokens
 14. **Edge functions scaffolded**: Razorpay order creation, webhook handling, AI support assistant
+
+### September 2026 — Phase 2 & 4 Parent App Implementation
+15. **Parent API service**: Created `packages/api-client/src/parent-api.ts` with typed queries for Hyderabad schools, scoped child management, route discovery with stops, fare snapshot calculation, atomic seat reservation via RPC, and payment initiation
+16. **Parent Mobile UI**: Implemented full React Native / Expo Router parent application in `apps/parent`:
+    - `AuthContext`: Phone OTP signin/verification with dev demo fast-login
+    - `(auth)/login`: Phone OTP screen with E.164 +91 validation and resend flow
+    - `(tabs)/children`: Child management with Hyderabad school directory dropdown, Zod validation, delete confirmation, empty/loading/error states
+    - `(tabs)/routes`: Active route discovery, school filter chips, timetable and vehicle inspection modal, booking modal with atomic seat locking
+    - `(tabs)/subscriptions`: Pending payments queue, Pay Now checkout modal, UUID idempotency keys, invoice receipt views
+    - `(tabs)/index`: Real-time commute tracking connected to live trip and milestone events
+    - `(tabs)/support`: 24/7 hotline dialer and support desk
+17. **Automated Parent Journey tests**: 14 tests in `packages/api-client/src/parent-journey.test.ts` covering authentication validation, school lookup, child creation, route discovery, fare calculation, booking creation, and payment idempotency. Full monorepo test suite: **54/54 passing**.
 

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
+  Linking,
 } from 'react-native';
 
 interface ChatMessage {
@@ -76,7 +77,10 @@ export default function SupportScreen() {
           <Text style={styles.hotlineTitle}>Emergency & Safety Desk</Text>
           <Text style={styles.hotlinePhone}>+91 40 4567 8900 / 112</Text>
         </View>
-        <TouchableOpacity style={styles.hotlineButton}>
+        <TouchableOpacity
+          style={styles.hotlineButton}
+          onPress={() => Linking.openURL('tel:+914045678900')}
+        >
           <Text style={styles.hotlineButtonText}>📞 Call Now</Text>
         </TouchableOpacity>
       </View>

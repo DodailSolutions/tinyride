@@ -62,13 +62,22 @@ const SELF_SERVICE_ROLES: TinyRideRole[] = ['parent', 'driver'];
  * Supabase Auth is configured for Phone OTP (no passwords).
  * SMS delivery is handled via Twilio/AWS SNS configured in Supabase project settings.
  */
-export async function requestOtp(phone: string): Promise<OtpRequestResult> {
+export async function requestOtp(
+  phone: string,
+  signupRole: TinyRideRole = 'parent'
+): Promise<OtpRequestResult> {
   const supabase = getTinyRideClient();
+  const safeRole: TinyRideRole = SELF_SERVICE_ROLES.includes(signupRole)
+    ? signupRole
+    : 'parent';
 
   const { error } = await supabase.auth.signInWithOtp({
     phone,
     options: {
       shouldCreateUser: true,
+      data: {
+        role: safeRole,
+      },
     },
   });
 
@@ -91,24 +100,14 @@ export async function requestOtp(phone: string): Promise<OtpRequestResult> {
 export async function verifyOtp(
   phone: string,
   otp: string,
-  signupRole: TinyRideRole = 'parent'
+  _signupRole: TinyRideRole = 'parent'
 ): Promise<OtpVerifyResult> {
   const supabase = getTinyRideClient();
-
-  // Clamp role to safe self-service values; prevent client-side admin escalation
-  const safeRole: TinyRideRole = SELF_SERVICE_ROLES.includes(signupRole)
-    ? signupRole
-    : 'parent';
 
   const { data, error } = await supabase.auth.verifyOtp({
     phone,
     token: otp,
     type: 'sms',
-    options: {
-      data: {
-        role: safeRole, // Passed to handle_new_user trigger on first sign-up
-      },
-    },
   });
 
   if (error || !data.session || !data.user) {
