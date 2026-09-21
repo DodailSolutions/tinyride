@@ -226,3 +226,40 @@ export const createSupportTicketSchema = z.object({
   description: z.string().trim().min(15, 'Please provide details of your issue'),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).default('MEDIUM'),
 });
+
+// ============================================================================
+// 7. CMS & LEAD CAPTURE SCHEMAS
+// ============================================================================
+
+export const cmsLeadSchema = z.object({
+  lead_type: z.enum(['PARENT', 'DRIVER', 'SCHOOL']),
+  full_name: z.string().trim().min(2, 'Name must be at least 2 characters'),
+  phone: phoneSchema,
+  email: z.string().email('Invalid email address').optional().or(z.literal('')),
+  area: z.string().trim().min(2, 'Please enter your neighborhood/locality in Hyderabad'),
+  school_name: z.string().trim().optional(),
+  child_grade: z.string().trim().optional(),
+  vehicle_type: z.enum(['AUTO', 'VAN']).optional(),
+  notes: z.string().max(500).optional(),
+});
+
+export const cmsFaqSchema = z.object({
+  category: z.string().trim().min(2, 'Category required'),
+  question: z.string().trim().min(5, 'Question required'),
+  answer: z.string().trim().min(10, 'Answer required'),
+  display_order: z.number().int().nonnegative().default(0),
+  is_active: z.boolean().default(true),
+});
+
+export const cmsArticleSchema = z.object({
+  slug: z.string().trim().min(3).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  title: z.string().trim().min(5, 'Title required'),
+  excerpt: z.string().trim().min(10, 'Excerpt required'),
+  content: z.string().trim().min(20, 'Content required'),
+  category: z.string().trim().min(2),
+  cover_image_url: z.string().url().optional().or(z.literal('')),
+  meta_title: z.string().max(70).optional(),
+  meta_description: z.string().max(160).optional(),
+  is_published: z.boolean().default(true),
+});
+

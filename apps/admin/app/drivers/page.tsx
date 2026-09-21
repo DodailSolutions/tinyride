@@ -15,7 +15,10 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 
+import { AdminShell } from '@/components/AdminShell';
+
 interface DriverItem {
+
   id: string;
   name: string;
   phone: string;
@@ -135,7 +138,9 @@ export default function DriversKYCDesk() {
   );
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto w-full">
+    <AdminShell>
+      <div className="p-8 space-y-6 max-w-7xl mx-auto w-full">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
@@ -345,5 +350,7 @@ export default function DriversKYCDesk() {
         </div>
       )}
     </div>
+    </AdminShell>
   );
 }
+

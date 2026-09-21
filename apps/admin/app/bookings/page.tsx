@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { CalendarCheck, CreditCard, CheckCircle, Clock, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { AdminShell } from '@/components/AdminShell';
 
 const BOOKINGS = [
+
   {
     id: 'bkg-101',
     parentName: 'Ananya Sharma',
@@ -53,7 +55,9 @@ const BOOKINGS = [
 
 export default function BookingsAndPaymentsPage() {
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto w-full">
+    <AdminShell>
+      <div className="p-8 space-y-6 max-w-7xl mx-auto w-full">
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -122,5 +126,7 @@ export default function BookingsAndPaymentsPage() {
         </div>
       </div>
     </div>
+    </AdminShell>
   );
 }
+

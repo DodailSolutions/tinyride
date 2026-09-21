@@ -12,8 +12,10 @@ import {
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
+import { AdminShell } from '@/components/AdminShell';
 
 interface RouteItem {
+
   id: string;
   name: string;
   schoolName: string;
@@ -120,7 +122,9 @@ export default function RoutesManagementPage() {
   };
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto w-full">
+    <AdminShell>
+      <div className="p-8 space-y-6 max-w-7xl mx-auto w-full">
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
@@ -262,5 +266,7 @@ export default function RoutesManagementPage() {
         ))}
       </div>
     </div>
+    </AdminShell>
   );
 }
+
