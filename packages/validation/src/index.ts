@@ -263,3 +263,54 @@ export const cmsArticleSchema = z.object({
   is_published: z.boolean().default(true),
 });
 
+// ============================================================================
+// 8. ROUTE OPTIMIZATION (AI-001) SCHEMAS
+// ============================================================================
+
+export const studentPickupInputSchema = z.object({
+  id: z.string().min(1, 'Stop ID is required'),
+  child_token: z.string().min(1, 'Anonymized child token is required'),
+  location: coordinatesSchema,
+  demand: z.number().int().min(1).default(1),
+  time_window_start: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Time must be HH:MM format')
+    .optional(),
+  time_window_end: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Time must be HH:MM format')
+    .optional(),
+});
+
+export const vehicleOptimizationInputSchema = z.object({
+  id: z.string().min(1, 'Vehicle ID is required'),
+  driver_id: z.string().min(1, 'Driver ID is required'),
+  vehicle_type: z.enum(['AUTO', 'VAN']),
+  capacity: z.number().int().min(1).max(20),
+  start_location: coordinatesSchema,
+  max_travel_time_minutes: z.number().int().positive().default(60),
+});
+
+export const routeOptimizationRequestSchema = z.object({
+  run_id: z.string().min(1, 'Run ID is required'),
+  school_id: z.string().min(1, 'School ID is required'),
+  school_name: z.string().min(1, 'School name is required'),
+  school_location: coordinatesSchema,
+  bell_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Bell time must be HH:MM format'),
+  shift: z.enum(['MORNING', 'AFTERNOON']).default('MORNING'),
+  vehicles: z
+    .array(vehicleOptimizationInputSchema)
+    .min(1, 'At least one vehicle required in fleet'),
+  stops: z.array(studentPickupInputSchema).min(1, 'At least one student stop is required'),
+  max_student_ride_time_minutes: z.number().int().min(10).max(120).default(45),
+});
+
+export const routeApprovalSchema = z.object({
+  run_id: z.string().min(1, 'Run ID is required'),
+  decision: z.enum(['APPROVE', 'REJECT']),
+  actor_id: z.string().min(1, 'Actor ID is required'),
+  actor_role: z.enum(['operations_admin', 'super_admin']),
+  admin_notes: z.string().trim().max(500).optional(),
+});
+
+

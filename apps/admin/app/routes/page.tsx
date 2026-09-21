@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Bus,
   Sparkles,
@@ -11,6 +12,7 @@ import {
   Check,
   AlertCircle,
   ArrowRight,
+  Cpu,
 } from 'lucide-react';
 import { AdminShell } from '@/components/AdminShell';
 
@@ -135,14 +137,23 @@ export default function RoutesManagementPage() {
             Configure approved Hyderabad routes, verify vehicle seat constraints, and run OR-Tools optimization.
           </p>
         </div>
-        <button
-          onClick={handleRunOptimizer}
-          disabled={isOptimizing}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold text-sm shadow-sm transition-colors disabled:opacity-50"
-        >
-          <Sparkles className="w-4 h-4" />
-          {isOptimizing ? 'Solving with OR-Tools...' : 'Run Route Optimization'}
-        </button>
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/routes/optimize"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-navy-900 hover:bg-brand-navy-800 text-white font-semibold text-sm shadow-sm transition-colors border border-brand-orange-500/20"
+          >
+            <Cpu className="w-4 h-4 text-brand-orange-400" />
+            AI Route Optimizer (OR-Tools)
+          </Link>
+          <button
+            onClick={handleRunOptimizer}
+            disabled={isOptimizing}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-semibold text-sm shadow-sm transition-colors disabled:opacity-50"
+          >
+            <Sparkles className="w-4 h-4" />
+            {isOptimizing ? 'Solving with OR-Tools...' : 'Quick Optimize'}
+          </button>
+        </div>
       </div>
 
       {/* OR-Tools Proposal Banner if generated */}

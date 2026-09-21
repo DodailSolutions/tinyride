@@ -343,3 +343,101 @@ export interface AuditLog {
   user_agent?: string | null;
   created_at: string;
 }
+
+// ============================================================================
+// AI-001 ROUTE OPTIMIZATION TYPES (Google OR-Tools CVRPTW)
+// ============================================================================
+
+export type OptimizationSolverStatus = 'OPTIMAL' | 'FEASIBLE' | 'INFEASIBLE';
+
+export type RouteConstraintViolationType =
+  | 'CAPACITY_EXCEEDED'
+  | 'TIME_WINDOW_MISMATCH'
+  | 'MAX_RIDE_TIME_EXCEEDED'
+  | 'DRIVER_UNAVAILABLE';
+
+export interface RouteConstraintViolation {
+  violation_type: RouteConstraintViolationType;
+  severity: 'WARNING' | 'ERROR';
+  message: string;
+  affected_stop_ids: string[];
+  affected_vehicle_id?: string | null;
+}
+
+export interface OptimizedStopAssignment {
+  stop_id: string;
+  child_token: string; // Anonymized token (child PII protected)
+  sequence_index: number;
+  estimated_arrival_time: string; // HH:MM
+  distance_from_prev_km: number;
+  cumulative_distance_km: number;
+  cumulative_duration_minutes: number;
+}
+
+export interface OptimizedRouteResult {
+  vehicle_id: string;
+  driver_id: string;
+  vehicle_type: 'AUTO' | 'VAN';
+  vehicle_capacity: number;
+  assigned_stops_count: number;
+  seat_utilization_pct: number;
+  total_distance_km: number;
+  total_duration_minutes: number;
+  stops: OptimizedStopAssignment[];
+}
+
+export interface StudentPickupInput {
+  id: string;
+  child_token: string; // Anonymized identifier e.g. "tok_aarav_01"
+  location: Coordinates;
+  demand: number; // usually 1
+  time_window_start?: string; // "07:15"
+  time_window_end?: string; // "07:45"
+}
+
+export interface VehicleOptimizationInput {
+  id: string;
+  driver_id: string;
+  vehicle_type: 'AUTO' | 'VAN';
+  capacity: number;
+  start_location: Coordinates;
+  max_travel_time_minutes?: number;
+}
+
+export interface RouteOptimizationRequest {
+  run_id: string;
+  school_id: string;
+  school_name: string;
+  school_location: Coordinates;
+  bell_time: string; // "08:15"
+  shift: 'MORNING' | 'AFTERNOON';
+  vehicles: VehicleOptimizationInput[];
+  stops: StudentPickupInput[];
+  max_student_ride_time_minutes?: number; // default 45
+}
+
+export interface RouteOptimizationResponse {
+  run_id: string;
+  status: OptimizationSolverStatus;
+  routes: OptimizedRouteResult[];
+  unassigned_stop_ids: string[];
+  constraint_violations: RouteConstraintViolation[];
+  total_fleet_distance_km: number;
+  total_fleet_duration_minutes: number;
+  average_seat_utilization_pct: number;
+  computation_time_ms: number;
+  solver_engine: string; // "Google OR-Tools CVRPTW" or "Heuristic CVRPTW Fallback"
+  recommendation_only: true; // Strict non-negotiable guardrail
+  created_at: string;
+}
+
+export interface RouteRecommendationApproval {
+  run_id: string;
+  decision: 'APPROVE' | 'REJECT';
+  actor_id: string;
+  actor_role: UserRole;
+  admin_notes?: string;
+  published_route_ids?: string[];
+  approved_at?: string;
+}
+

@@ -18,10 +18,31 @@
 | **Phase 4** | Route Configuration, Discovery & Seat Booking | 🟢 Completed | 100% | Real route discovery, capacity checks, immutable fare snapshots, atomic seat reservation via RPC |
 | **Phase 5** | Razorpay Payments & Subscriptions | 🟢 Completed | 80% | In-app checkout flow, UUID idempotency keys, invoice receipts, booking status transition to CONFIRMED |
 | **Phase 6** | Driver Trip Execution, Offline Sync & Milestones | 🟢 Completed | 100% | `apps/driver` complete MVP: Two-tap trip execution, motion safety guard, route & seat management, booking requests, daily shift timetable, offline sync queue with UUID idempotency, 79/79 tests |
-| **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 11 operational modules + CMS, 19 static routes built, role-scoped security (`operations_admin`), 86/86 tests |
-| **Phase 8** | Google OR-Tools Route Optimization | 🟡 Scaffolded | 70% | `services/route-optimizer` CVRPTW solver implemented and tested |
+| **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 11 operational modules + CMS, 20 static routes built, role-scoped security (`operations_admin`), 99/99 tests |
+| **Phase 8** | Google OR-Tools Route Optimization (AI-001) | 🟢 Completed | 100% | CVRPTW solver, Zod validation, human review guardrail, `/routes/optimize` desk, FastAPI service, Dockerfile, 99/99 tests |
 | **Phase 9** | AI Support Assistant & Assistive OCR | 🟡 Scaffolded | 30% | Edge Function `ai-support-assistant` scaffolded |
 | **Phase 10** | Security Hardening & App Store Readiness | 🔴 Not Started | 5% | Bundle IDs defined in ARCHITECTURE.md, EAS config pending |
+
+---
+
+## Phase 8 — Google OR-Tools Route Optimization (Completed)
+
+### ✅ CVRPTW Optimization Engine (`services/route-optimizer`)
+- [x] **Google OR-Tools Solver**: Capacitated Vehicle Routing Problem with Time Windows (`pywrapcp`, `routing_enums_pb2`).
+- [x] **Heuristic CVRPTW Fallback**: Zero-dependency 2-Opt local refinement solver with exact same schema and constraint checkers.
+- [x] **Constraint Verification**: Vehicle capacity (Auto: 3–6, Van: 6–14), maximum student ride time ($\le 45$ mins), school bell time windows.
+- [x] **Violation Reporting**: Explicit detection of `CAPACITY_EXCEEDED`, `TIME_WINDOW_MISMATCH`, `MAX_RIDE_TIME_EXCEEDED`.
+- [x] **Child Privacy Protection**: Student PII is never exposed to the solver; only anonymized tokens (`tok_xxx`) and GPS coordinates are used.
+- [x] **FastAPI Microservice (`app.py`)**: `POST /api/v1/optimize`, `GET /api/v1/health` with Pydantic schemas.
+- [x] **Docker Container & Documentation**: Multi-stage `Dockerfile` (Python 3.11) and complete deployment guide in `README.md`.
+
+### ✅ TypeScript Service & Admin Dashboard Integration
+- [x] **Shared Contracts**: `@tinyride/types` (`RouteOptimizationRequest`, `RouteOptimizationResponse`, `RouteRecommendationApproval`).
+- [x] **Zod Validation**: `@tinyride/validation` (`routeOptimizationRequestSchema`, `routeApprovalSchema`).
+- [x] **Service Layer**: `@tinyride/api-client` (`executeRouteOptimization`, `approveRouteRecommendation`, `rejectRouteRecommendation`).
+- [x] **Human-in-the-Loop Guardrail**: Route modifications are marked `recommendation_only: true` and are **never published automatically**.
+- [x] **Admin Route Optimization Desk (`/routes/optimize`)**: School/shift selector, active fleet preview, route cards with ETAs and capacity gauges, and approval modal with mandatory audit logging.
+- [x] **Test Verification**: 5/5 Python unit tests passing; 13/13 TypeScript route optimizer vitest tests passing (**99/99 tests passing monorepo-wide**); Next.js production build verified (**20/20 static pages built**).
 
 ---
 
