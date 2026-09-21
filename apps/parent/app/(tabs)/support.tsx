@@ -124,7 +124,7 @@ export default function SupportScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 10 },
-  title: { fontSize: 22, fontWeight: '800', color: '#0F1E36' },
+  title: { fontSize: 22, fontWeight: '800', color: '#142B4A' },
   sub: { fontSize: 12, color: '#64748B', marginTop: 2 },
   hotlineCard: {
     backgroundColor: '#FEF2F2',
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   chatArea: { flex: 1 },
   chatContent: { padding: 20, gap: 12 },
   messageBubble: { maxWidth: '80%', padding: 12, borderRadius: 14 },
-  userBubble: { alignSelf: 'flex-end', backgroundColor: '#0F1E36' },
+  userBubble: { alignSelf: 'flex-end', backgroundColor: '#142B4A' },
   assistantBubble: {
     alignSelf: 'flex-start',
     backgroundColor: '#FFFFFF',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   messageText: { fontSize: 13, lineHeight: 18 },
   userText: { color: '#FFFFFF' },
-  assistantText: { color: '#0F1E36' },
+  assistantText: { color: '#142B4A' },
   timeText: { fontSize: 10, color: '#94A3B8', alignSelf: 'flex-end', marginTop: 4 },
   inputContainer: {
     flexDirection: 'row',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   sendButton: {
-    backgroundColor: '#FF6B00',
+    backgroundColor: '#F07832',
     paddingHorizontal: 16,
     borderRadius: 10,
     justifyContent: 'center',

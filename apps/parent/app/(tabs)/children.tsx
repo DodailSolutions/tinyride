@@ -61,10 +61,10 @@ export default function ChildrenScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <div>
+          <View>
             <Text style={styles.title}>Child Profiles</Text>
             <Text style={styles.sub}>Manage school transport registrations</Text>
-          </div>
+          </View>
           <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
             <Text style={styles.addButtonText}>+ Add Child</Text>
           </TouchableOpacity>
@@ -165,10 +165,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  title: { fontSize: 22, fontWeight: '800', color: '#0F1E36' },
+  title: { fontSize: 22, fontWeight: '800', color: '#142B4A' },
   sub: { fontSize: 12, color: '#64748B', marginTop: 2 },
   addButton: {
-    backgroundColor: '#FF6B00',
+    backgroundColor: '#F07832',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 10,
@@ -187,21 +187,21 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16 },
-  name: { fontSize: 16, fontWeight: '800', color: '#0F1E36' },
+  name: { fontSize: 16, fontWeight: '800', color: '#142B4A' },
   grade: { fontSize: 12, color: '#64748B', marginTop: 1 },
   school: { fontSize: 12, color: '#047857', fontWeight: '600', marginTop: 3 },
   detailSection: { marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F1F5F9' },
   sectionLabel: { fontSize: 11, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
   sectionValue: { fontSize: 12, color: '#1E293B', marginTop: 2 },
-  guardianBadge: { fontSize: 12, color: '#0F1E36', marginTop: 2, fontWeight: '500' },
+  guardianBadge: { fontSize: 12, color: '#142B4A', marginTop: 2, fontWeight: '500' },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(15, 30, 54, 0.5)',
+    backgroundColor: 'rgba(20, 43, 74, 0.5)',
     justifyContent: 'center',
     padding: 20,
   },
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
   },
-  modalTitle: { fontSize: 18, fontWeight: '800', color: '#0F1E36', marginBottom: 14 },
+  modalTitle: { fontSize: 18, fontWeight: '800', color: '#142B4A', marginBottom: 14 },
   inputLabel: { fontSize: 12, fontWeight: '600', color: '#334155', marginTop: 8, marginBottom: 4 },
   input: {
     borderWidth: 1,
@@ -222,6 +222,6 @@ const styles = StyleSheet.create({
   modalButtons: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 18 },
   cancelBtn: { paddingHorizontal: 14, paddingVertical: 8 },
   cancelBtnText: { color: '#64748B', fontWeight: '600', fontSize: 13 },
-  saveBtn: { backgroundColor: '#0F1E36', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
+  saveBtn: { backgroundColor: '#142B4A', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8 },
   saveBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 13 },
 });

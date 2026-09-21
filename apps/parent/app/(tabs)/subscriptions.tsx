@@ -56,10 +56,10 @@ export default function SubscriptionsScreen() {
         {PAYMENTS_HISTORY.map((item) => (
           <View key={item.id} style={styles.historyCard}>
             <View style={styles.historyHeader}>
-              <div>
+              <View>
                 <Text style={styles.monthText}>{item.month}</Text>
                 <Text style={styles.childText}>{item.child}</Text>
-              </div>
+              </View>
               <View style={styles.badgePaid}>
                 <Text style={styles.badgePaidText}>✓ {item.status}</Text>
               </View>
@@ -85,21 +85,21 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8FAFC' },
   scrollContent: { padding: 20 },
   header: { marginBottom: 20 },
-  title: { fontSize: 22, fontWeight: '800', color: '#0F1E36' },
+  title: { fontSize: 22, fontWeight: '800', color: '#142B4A' },
   sub: { fontSize: 12, color: '#64748B', marginTop: 2 },
   currentCard: {
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     borderRadius: 16,
     padding: 18,
     marginBottom: 24,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  currentTag: { fontSize: 10, fontWeight: '800', color: '#FF6B00', letterSpacing: 0.5 },
+  currentTag: { fontSize: 10, fontWeight: '800', color: '#F07832', letterSpacing: 0.5 },
   price: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' },
   subTitle: { fontSize: 16, fontWeight: '700', color: '#FFFFFF', marginTop: 6 },
   subDates: { fontSize: 12, color: '#94A3B8', marginTop: 4 },
   nextDate: { fontSize: 11, color: '#CBD5E1', marginTop: 10, fontWeight: '500' },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#0F1E36', marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#142B4A', marginBottom: 12 },
   historyCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   historyHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  monthText: { fontSize: 14, fontWeight: '700', color: '#0F1E36' },
+  monthText: { fontSize: 14, fontWeight: '700', color: '#142B4A' },
   childText: { fontSize: 12, color: '#64748B', marginTop: 1 },
   badgePaid: { backgroundColor: '#ECFDF5', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
   badgePaidText: { fontSize: 11, fontWeight: '700', color: '#047857' },
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F1F5F9',
   },
-  amountText: { fontSize: 15, fontWeight: '800', color: '#0F1E36' },
+  amountText: { fontSize: 15, fontWeight: '800', color: '#142B4A' },
   methodText: { fontSize: 11, color: '#64748B', marginTop: 1 },
   receiptButton: {
     borderWidth: 1,
@@ -131,5 +131,5 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
   },
-  receiptButtonText: { fontSize: 11, fontWeight: '600', color: '#0F1E36' },
+  receiptButtonText: { fontSize: 11, fontWeight: '600', color: '#142B4A' },
 });

@@ -82,10 +82,10 @@ export default function DriverTripScreen() {
     <SafeAreaView style={styles.container}>
       {/* Top Bar with Offline indicator */}
       <View style={styles.topBar}>
-        <div>
+        <View>
           <Text style={styles.brandTitle}>TinyRide Driver</Text>
           <Text style={styles.routeHeader}>Kondapur ➔ DPS Gachibowli</Text>
-        </div>
+        </View>
         <View style={styles.syncBadge}>
           <Text style={styles.syncText}>
             {offlinePendingCount > 0 ? `Syncing (${offlinePendingCount})...` : '🟢 Online'}
@@ -103,10 +103,10 @@ export default function DriverTripScreen() {
       {/* Trip Controller */}
       <View style={styles.tripSummaryCard}>
         <View style={styles.summaryRow}>
-          <div>
+          <View>
             <Text style={styles.summaryLabel}>Morning Shift</Text>
             <Text style={styles.summaryTime}>Target Arrival: 08:15 AM</Text>
-          </div>
+          </View>
           <View style={styles.counterBox}>
             <Text style={styles.counterNum}>
               {pickedCount} / {passengers.length}
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   brandTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF' },
-  routeHeader: { fontSize: 12, color: '#FF6B00', fontWeight: '600', marginTop: 2 },
+  routeHeader: { fontSize: 12, color: '#F07832', fontWeight: '600', marginTop: 2 },
   syncBadge: {
     backgroundColor: '#1E293B',
     paddingHorizontal: 10,
@@ -204,18 +204,18 @@ const styles = StyleSheet.create({
   },
   safetyText: { fontSize: 11, color: '#FDE68A', fontWeight: '600' },
   tripSummaryCard: {
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     borderRadius: 16,
     marginHorizontal: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#1B2F4E',
+    borderColor: '#1E3A5F',
   },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   summaryLabel: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
   summaryTime: { fontSize: 12, color: '#94A3B8', marginTop: 2 },
   counterBox: { alignItems: 'flex-end' },
-  counterNum: { fontSize: 22, fontWeight: '800', color: '#FF6B00' },
+  counterNum: { fontSize: 22, fontWeight: '800', color: '#F07832' },
   counterSub: { fontSize: 10, color: '#94A3B8', textTransform: 'uppercase' },
   startTripButton: {
     backgroundColor: '#10B981',
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   startTripButtonText: { color: '#FFFFFF', fontWeight: '800', fontSize: 16, letterSpacing: 0.5 },
   endTripButton: {
-    backgroundColor: '#FF6B00',
+    backgroundColor: '#F07832',
     borderRadius: 12,
     height: 54,
     alignItems: 'center',
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   listArea: { flex: 1 },
   listContent: { paddingHorizontal: 16, gap: 10, paddingBottom: 30 },
   passengerCard: {
-    backgroundColor: '#1B2F4E',
+    backgroundColor: '#1E3A5F',
     borderRadius: 14,
     padding: 16,
     flexDirection: 'row',

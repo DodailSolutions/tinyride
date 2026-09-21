@@ -106,16 +106,16 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#0F1E36',
+    color: '#142B4A',
   },
   brandTagline: {
     fontSize: 12,
-    color: '#FF6B00',
+    color: '#F07832',
     fontWeight: '600',
   },
   badge: {
     backgroundColor: '#FFF5EB',
-    borderColor: '#FF6B00',
+    borderColor: '#F07832',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    color: '#FF6B00',
+    color: '#F07832',
     fontWeight: '700',
   },
   activeCard: {
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   childName: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#0F1E36',
+    color: '#142B4A',
   },
   schoolSub: {
     fontSize: 13,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   driverName: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F1E36',
+    color: '#142B4A',
   },
   driverVehicle: {
     fontSize: 11,
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   callButtonText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0F1E36',
+    color: '#142B4A',
   },
   milestones: {
     marginTop: 14,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F1E36',
+    color: '#142B4A',
     marginTop: 24,
     marginBottom: 12,
   },
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F1E36',
+    color: '#142B4A',
   },
   actionDesc: {
     fontSize: 11,

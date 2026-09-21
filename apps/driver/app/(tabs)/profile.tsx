@@ -75,10 +75,10 @@ export default function DriverProfileScreen() {
         <Text style={styles.sectionHeading}>Approved Vehicle</Text>
         <View style={styles.vehicleCard}>
           <View style={styles.vehHeader}>
-            <div>
+            <View>
               <Text style={styles.vehModel}>Bajaj Compact RE (Auto)</Text>
               <Text style={styles.vehReg}>Registration: TS09UA1234</Text>
-            </div>
+            </View>
             <View style={styles.capBadge}>
               <Text style={styles.capText}>4 Seats Max</Text>
             </View>
@@ -120,11 +120,11 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
   sub: { fontSize: 12, color: '#94A3B8', marginTop: 2 },
   profileCard: {
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#1B2F4E',
+    borderColor: '#1E3A5F',
     marginBottom: 20,
   },
   profileRow: { flexDirection: 'row', gap: 14, alignItems: 'center' },
@@ -132,11 +132,11 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#1B2F4E',
+    backgroundColor: '#1E3A5F',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#FF6B00', fontWeight: '800', fontSize: 18 },
+  avatarText: { color: '#F07832', fontWeight: '800', fontSize: 18 },
   name: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
   phone: { fontSize: 12, color: '#94A3B8', marginTop: 1 },
   verifiedBadge: {
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#1B2F4E',
+    borderTopColor: '#1E3A5F',
   },
   statBox: { alignItems: 'center' },
   statVal: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
@@ -167,21 +167,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   vehicleCard: {
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#1B2F4E',
+    borderColor: '#1E3A5F',
     marginBottom: 20,
   },
   vehHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   vehModel: { fontSize: 15, fontWeight: '700', color: '#FFFFFF' },
-  vehReg: { fontSize: 12, color: '#FF6B00', marginTop: 2, fontWeight: '600' },
-  capBadge: { backgroundColor: '#1B2F4E', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  vehReg: { fontSize: 12, color: '#F07832', marginTop: 2, fontWeight: '600' },
+  capBadge: { backgroundColor: '#1E3A5F', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   capText: { fontSize: 11, fontWeight: '700', color: '#E2E8F0' },
   docList: { marginTop: 12, gap: 8 },
   docItem: {
-    backgroundColor: '#1B2F4E',
+    backgroundColor: '#1E3A5F',
     padding: 10,
     borderRadius: 8,
     flexDirection: 'row',

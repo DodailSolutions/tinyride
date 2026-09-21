@@ -68,20 +68,20 @@ export default function DriverEarningsScreen() {
         {PAYOUTS.map((item) => (
           <View key={item.id} style={styles.payoutCard}>
             <View style={styles.payoutTop}>
-              <div>
+              <View>
                 <Text style={styles.periodText}>{item.period}</Text>
                 <Text style={styles.tripsText}>{item.trips} Trips Completed Safely</Text>
-              </div>
+              </View>
               <View style={styles.badgeSuccess}>
                 <Text style={styles.badgeText}>✓ {item.status}</Text>
               </View>
             </View>
 
             <View style={styles.payoutBottom}>
-              <div>
+              <View>
                 <Text style={styles.netVal}>₹{item.net.toLocaleString('en-IN')}</Text>
                 <Text style={styles.refText}>Ref: {item.ref}</Text>
-              </div>
+              </View>
               <Text style={styles.dateText}>{item.date}</Text>
             </View>
           </View>
@@ -98,21 +98,21 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
   sub: { fontSize: 12, color: '#94A3B8', marginTop: 2 },
   currentMonthCard: {
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#1B2F4E',
+    borderColor: '#1E3A5F',
     marginBottom: 24,
   },
-  cardHeader: { fontSize: 11, fontWeight: '800', color: '#FF6B00', letterSpacing: 0.5 },
+  cardHeader: { fontSize: 11, fontWeight: '800', color: '#F07832', letterSpacing: 0.5 },
   currentNet: { fontSize: 28, fontWeight: '800', color: '#FFFFFF', marginTop: 6 },
   currentSub: { fontSize: 12, color: '#94A3B8', marginTop: 2 },
-  feeBreakdown: { marginTop: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#1B2F4E', gap: 6 },
+  feeBreakdown: { marginTop: 16, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#1E3A5F', gap: 6 },
   breakdownRow: { flexDirection: 'row', justifyContent: 'space-between' },
   breakdownLabel: { fontSize: 12, color: '#94A3B8' },
   breakdownVal: { fontSize: 12, color: '#E2E8F0', fontWeight: '600' },
-  totalRow: { marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#1B2F4E' },
+  totalRow: { marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#1E3A5F' },
   totalLabel: { fontSize: 12, fontWeight: '700', color: '#FFFFFF' },
   totalVal: { fontSize: 13, fontWeight: '800', color: '#10B981' },
   sectionHeading: {
@@ -123,11 +123,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   payoutCard: {
-    backgroundColor: '#0F1E36',
+    backgroundColor: '#142B4A',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#1B2F4E',
+    borderColor: '#1E3A5F',
     marginBottom: 12,
   },
   payoutTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#1B2F4E',
+    borderTopColor: '#1E3A5F',
   },
   netVal: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
   refText: { fontSize: 10, color: '#64748B', fontFamily: 'monospace', marginTop: 1 },
