@@ -5,12 +5,19 @@ import Link from 'next/link';
 import { Menu, X, Shield, PhoneCall, ArrowRight, UserCheck } from 'lucide-react';
 
 interface LandingHeaderProps {
-  onOpenWaitlist: (type?: 'PARENT' | 'DRIVER' | 'SCHOOL') => void;
+  onOpenWaitlist?: (type?: 'PARENT' | 'DRIVER' | 'SCHOOL') => void;
 }
-
 
 export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleWaitlistClick = (type: 'PARENT' | 'DRIVER' | 'SCHOOL') => {
+    if (onOpenWaitlist) {
+      onOpenWaitlist(type);
+    } else if (typeof window !== 'undefined') {
+      window.location.href = `/?waitlist=true&type=${type}`;
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-brand-navy-950/90 border-b border-brand-navy-800/80 transition-all">
@@ -62,13 +69,13 @@ export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
               Operations Portal
             </Link>
             <button
-              onClick={() => onOpenWaitlist('DRIVER')}
+              onClick={() => handleWaitlistClick('DRIVER')}
               className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-brand-navy-800 text-brand-orange-400 hover:bg-brand-navy-700 transition-colors border border-brand-orange-500/30"
             >
               Drive with Us
             </button>
             <button
-              onClick={() => onOpenWaitlist('PARENT')}
+              onClick={() => handleWaitlistClick('PARENT')}
               className="px-4 py-2 rounded-lg text-xs font-bold bg-brand-orange-500 text-white hover:bg-brand-orange-600 shadow-md shadow-orange-950/40 transition-colors flex items-center gap-1.5"
             >
               Join Hyderabad Waitlist
@@ -79,7 +86,7 @@ export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
             <button
-              onClick={() => onOpenWaitlist('PARENT')}
+              onClick={() => handleWaitlistClick('PARENT')}
               className="px-3 py-1.5 text-xs font-bold bg-brand-orange-500 text-white rounded-lg"
             >
               Waitlist
@@ -143,7 +150,7 @@ export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
-                onOpenWaitlist('DRIVER');
+                handleWaitlistClick('DRIVER');
               }}
               className="py-2 text-center text-xs font-semibold text-brand-orange-400 bg-brand-navy-800 rounded-lg border border-brand-orange-500/30"
             >
