@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -5,101 +6,144 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Linking,
+  Alert,
+  RefreshControl,
 } from 'react-native';
-
-const PASSENGERS = [
-  {
-    id: 'c-1',
-    name: 'Aarav Sharma',
-    grade: '3rd Standard',
-    school: 'DPS Gachibowli',
-    stop: 'Kondapur RTO Cross (Opp. HP Petrol Pump)',
-    parent: 'Ananya Sharma',
-    phone: '+91 98490 88776',
-    specialNotes: 'Child carries blue backpack with asthma inhaler in side pocket.',
-  },
-  {
-    id: 'c-2',
-    name: 'Ananya Rao',
-    grade: '4th Standard',
-    school: 'DPS Gachibowli',
-    stop: 'Chirec Avenue (Near Gate 2)',
-    parent: 'Srinivas Rao',
-    phone: '+91 98490 55443',
-    specialNotes: 'Handover only to mother or grandfather.',
-  },
-  {
-    id: 'c-3',
-    name: 'Siddharth M',
-    grade: '2nd Standard',
-    school: 'DPS Gachibowli',
-    stop: 'Botanical Garden Main Gate',
-    parent: 'Madhavan V',
-    phone: '+91 98490 44332',
-    specialNotes: null,
-  },
-  {
-    id: 'c-4',
-    name: 'Rohan Verma',
-    grade: '5th Standard',
-    school: 'DPS Gachibowli',
-    stop: 'Botanical Garden Main Gate',
-    parent: 'Rajesh Verma',
-    phone: '+91 98490 33221',
-    specialNotes: null,
-  },
-];
+import { brandTokens } from '@tinyride/ui';
+import { fetchDriverRoster, RosterPassenger, SEED_DRIVER_ID } from '@tinyride/api-client';
+import { useAuth } from '../../src/context/AuthContext';
+import { LoadingIndicator, EmptyState, ErrorBanner } from '../../src/components/UIState';
 
 export default function DriverRosterScreen() {
+  const { user } = useAuth();
+  const driverId = user?.id || SEED_DRIVER_ID;
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [routeName, setRouteName] = useState<string>('');
+  const [schoolName, setSchoolName] = useState<string>('');
+  const [passengers, setPassengers] = useState<RosterPassenger[]>([]);
+
+  const loadRoster = useCallback(async () => {
+    try {
+      setError(null);
+      const res = await fetchDriverRoster(driverId);
+      setRouteName(res.routeName);
+      setSchoolName(res.schoolName);
+      setPassengers(res.passengers);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch passenger roster');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [driverId]);
+
+  useEffect(() => {
+    loadRoster();
+  }, [loadRoster]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadRoster();
+  };
+
+  const handleCallParent = (phone: string, parentName: string) => {
+    const url = `tel:${phone}`;
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(url);
+        } else {
+          Alert.alert('Phone Call', `Dial ${parentName} directly at ${phone}`);
+        }
+      })
+      .catch(() => {
+        Alert.alert('Phone Call', `Dial ${parentName} directly at ${phone}`);
+      });
+  };
+
+  if (loading && !refreshing) {
+    return <LoadingIndicator message="Fetching assigned passenger roster..." />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#F07832" />}
+      >
         <View style={styles.header}>
           <Text style={styles.title}>Assigned Passengers</Text>
-          <Text style={styles.sub}>DPS Gachibowli Morning & Afternoon Roster</Text>
+          <Text style={styles.sub}>{schoolName || 'DPS Gachibowli'} • {routeName || 'Morning & Afternoon Roster'}</Text>
         </View>
 
         <View style={styles.noticeBox}>
           <Text style={styles.noticeText}>
-            🔒 PRIVACY PROTECTED: Displaying only students assigned to Auto TS09UA1234.
+            🔒 PRIVACY PROTECTED: Displaying authorized students assigned to your verified vehicle.
           </Text>
         </View>
 
-        {PASSENGERS.map((p) => (
-          <View key={p.id} style={styles.card}>
-            <View style={styles.cardTop}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{p.name.substring(0, 2).toUpperCase()}</Text>
+        {error && <ErrorBanner message={error} onRetry={loadRoster} />}
+
+        {passengers.length === 0 ? (
+          <EmptyState
+            icon="🎒"
+            title="No Students Assigned Yet"
+            description="When parents book seats on your route and bookings are confirmed, their stop schedule will appear here."
+            actionLabel="Refresh Roster"
+            onAction={loadRoster}
+          />
+        ) : (
+          passengers.map((p, index) => (
+            <View key={p.childId} style={styles.card}>
+              <View style={styles.cardTop}>
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>{p.name.substring(0, 2).toUpperCase()}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.name}>{p.name}</Text>
+                  <Text style={styles.grade}>{p.grade} • Stop #{index + 1}</Text>
+                </View>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.name}>{p.name}</Text>
-                <Text style={styles.grade}>{p.grade} • {p.school}</Text>
+
+              <View style={styles.details}>
+                <Text style={styles.detailLabel}>Pickup Landmark & Time:</Text>
+                <Text style={styles.detailVal}>📍 {p.stopName} (⏰ {p.pickupTime})</Text>
+              </View>
+
+              {p.specialInstructions && (
+                <View style={styles.specialNotesBox}>
+                  <Text style={styles.notesLabel}>Special Care Instruction:</Text>
+                  <Text style={styles.notesVal}>ℹ️ {p.specialInstructions}</Text>
+                </View>
+              )}
+
+              {p.medicalNotes && (
+                <View style={styles.medicalBox}>
+                  <Text style={styles.medicalLabel}>Medical / Health Alert:</Text>
+                  <Text style={styles.medicalVal}>🩺 {p.medicalNotes}</Text>
+                </View>
+              )}
+
+              <View style={styles.cardFooter}>
+                <View>
+                  <Text style={styles.parentLabel}>Primary Guardian:</Text>
+                  <Text style={styles.parentName}>{p.parentName}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.callBtn}
+                  onPress={() => handleCallParent(p.parentPhone, p.parentName)}
+                >
+                  <Text style={styles.callBtnText}>📞 Call {p.parentPhone}</Text>
+                </TouchableOpacity>
               </View>
             </View>
-
-            <View style={styles.details}>
-              <Text style={styles.detailLabel}>Pickup Landmark:</Text>
-              <Text style={styles.detailVal}>📍 {p.stop}</Text>
-            </View>
-
-            {p.specialNotes && (
-              <View style={styles.specialNotesBox}>
-                <Text style={styles.notesLabel}>Special Care Instruction:</Text>
-                <Text style={styles.notesVal}>ℹ️ {p.specialNotes}</Text>
-              </View>
-            )}
-
-            <View style={styles.cardFooter}>
-              <View>
-                <Text style={styles.parentLabel}>Primary Guardian:</Text>
-                <Text style={styles.parentName}>{p.parent}</Text>
-              </View>
-              <TouchableOpacity style={styles.callBtn}>
-                <Text style={styles.callBtnText}>📞 {p.phone}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -107,19 +151,19 @@ export default function DriverRosterScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#070D18' },
-  scrollContent: { padding: 20 },
+  scrollContent: { padding: 20, paddingBottom: 40 },
   header: { marginBottom: 14 },
   title: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
-  sub: { fontSize: 12, color: '#94A3B8', marginTop: 2 },
+  sub: { fontSize: 12, color: brandTokens.warmOrange, marginTop: 3, fontWeight: '600' },
   noticeBox: {
     backgroundColor: '#142B4A',
-    padding: 10,
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#1E3A5F',
     marginBottom: 16,
   },
-  noticeText: { fontSize: 11, color: '#93C5FD', fontWeight: '600' },
+  noticeText: { fontSize: 11, color: '#93C5FD', fontWeight: '600', lineHeight: 16 },
   card: {
     backgroundColor: '#142B4A',
     borderRadius: 16,
@@ -137,12 +181,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: '#F07832', fontWeight: '800', fontSize: 14 },
+  avatarText: { color: brandTokens.warmOrange, fontWeight: '800', fontSize: 14 },
   name: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
   grade: { fontSize: 12, color: '#94A3B8', marginTop: 2 },
   details: { marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#1E3A5F' },
   detailLabel: { fontSize: 10, fontWeight: '700', color: '#64748B', textTransform: 'uppercase' },
-  detailVal: { fontSize: 12, color: '#E2E8F0', marginTop: 2 },
+  detailVal: { fontSize: 12, color: '#E2E8F0', marginTop: 2, fontWeight: '600' },
   specialNotesBox: {
     backgroundColor: '#1E3A5F',
     padding: 10,
@@ -151,6 +195,16 @@ const styles = StyleSheet.create({
   },
   notesLabel: { fontSize: 10, fontWeight: '700', color: '#F59E0B', textTransform: 'uppercase' },
   notesVal: { fontSize: 11, color: '#FDE68A', marginTop: 2 },
+  medicalBox: {
+    backgroundColor: '#450A0A',
+    borderWidth: 1,
+    borderColor: '#7F1D1D',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  medicalLabel: { fontSize: 10, fontWeight: '700', color: '#F87171', textTransform: 'uppercase' },
+  medicalVal: { fontSize: 11, color: '#FECACA', marginTop: 2 },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -162,6 +216,13 @@ const styles = StyleSheet.create({
   },
   parentLabel: { fontSize: 10, color: '#64748B' },
   parentName: { fontSize: 12, color: '#FFFFFF', fontWeight: '700' },
-  callBtn: { backgroundColor: '#1E293B', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
-  callBtnText: { color: '#F07832', fontWeight: '700', fontSize: 11 },
+  callBtn: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  callBtnText: { color: brandTokens.warmOrange, fontWeight: '700', fontSize: 11 },
 });

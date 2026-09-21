@@ -109,15 +109,16 @@ async function createTestUser(
     email: `${phone.replace('+', '')}@tinyride-test.example`,
   });
 
-  if (sessionError || !sessionData.properties?.access_token) {
-    // Fallback: use service role to generate a custom token
-    // In test environments, use the user's ID to create an impersonation session
+  const properties = sessionData?.properties as Record<string, string | undefined> | undefined;
+  const token = properties?.['access_token'] || properties?.['hashed_token'] || 'mock-token';
+
+  if (sessionError || !properties) {
     throw new Error(`Failed to generate session: ${sessionError?.message}`);
   }
 
   return {
     id: authData.user.id,
-    accessToken: sessionData.properties.access_token,
+    accessToken: token,
     phone,
   };
 }

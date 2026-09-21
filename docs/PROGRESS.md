@@ -14,10 +14,10 @@
 |---|---|---|---|---|
 | **Phase 1** | Monorepo Setup, Shared Packages, Supabase DB & RLS | 🟢 Completed | 100% | pnpm monorepo, 5 packages, 5 DB migrations, RLS on 18 tables, audit log triggers, typed DB schema, auth helpers, 40/40 tests |
 | **Phase 2** | Parent Profile, Multiple Children & Schools | 🟢 Completed | 100% | `apps/parent` production MVP: Phone OTP auth, multi-child profiles, Hyderabad school selector, route discovery, atomic seat reservations, in-app payments, 54/54 tests |
-| **Phase 3** | Driver Onboarding, Documents & Admin KYC | 🟡 Scaffolded | 40% | `apps/admin` KYC Desk with Telangana DL/FC/PCC auditing & approve/reject workflows |
+| **Phase 3** | Driver Onboarding, Documents & Admin KYC | 🟢 Completed | 100% | Commercial driver profile onboarding, Telangana vehicle registration validation, KYC doc upload (DL, FC, PCC), strict `UNDER_REVIEW` non-negotiable admin audit lock |
 | **Phase 4** | Route Configuration, Discovery & Seat Booking | 🟢 Completed | 100% | Real route discovery, capacity checks, immutable fare snapshots, atomic seat reservation via RPC |
 | **Phase 5** | Razorpay Payments & Subscriptions | 🟢 Completed | 80% | In-app checkout flow, UUID idempotency keys, invoice receipts, booking status transition to CONFIRMED |
-| **Phase 6** | Driver Trip Execution, Offline Sync & Milestones | 🟡 Scaffolded | 30% | `apps/driver` Expo Router app scaffolded, two-tap trip execution, UUID idempotency keys, offline sync queue |
+| **Phase 6** | Driver Trip Execution, Offline Sync & Milestones | 🟢 Completed | 100% | `apps/driver` complete MVP: Two-tap trip execution (`TRIP_STARTED` -> `PICKED_UP`/`ABSENT` -> `DROPPED`), persistent `OfflineTripSyncQueue`, UUID idempotency, 72/72 tests |
 | **Phase 7** | Admin Operations Dashboard (Next.js 15) | 🟢 Completed | 100% | Next.js 15 App Router (`apps/admin`), 14 static routes built, live trip monitor, safety incident desk |
 | **Phase 8** | Google OR-Tools Route Optimization | 🟡 Scaffolded | 70% | `services/route-optimizer` CVRPTW solver implemented and tested |
 | **Phase 9** | AI Support Assistant & Assistive OCR | 🟡 Scaffolded | 30% | Edge Function `ai-support-assistant` scaffolded |
@@ -191,4 +191,23 @@ RAZORPAY_WEBHOOK_SECRET=<webhook_secret>
     - `(tabs)/index`: Real-time commute tracking connected to live trip and milestone events
     - `(tabs)/support`: 24/7 hotline dialer and support desk
 17. **Automated Parent Journey tests**: 14 tests in `packages/api-client/src/parent-journey.test.ts` covering authentication validation, school lookup, child creation, route discovery, fare calculation, booking creation, and payment idempotency. Full monorepo test suite: **54/54 passing**.
+
+### September 2026 — Phase 3 & 6 Driver App Implementation
+18. **Driver API service**: Created `packages/api-client/src/driver-api.ts` with typed queries and mutations for:
+    - Driver profile lookup, commercial driver onboarding, and KYC audit state tracking
+    - Approved vehicle specifications with Telangana registration validation and local capacity limits (Auto: 3-6, Van: 6-14)
+    - Document submission for human admin audit (DL, FC, Insurance, PCC with `PENDING` status lock)
+    - Route discovery and assigned student roster with pickup sequence, timing, landmark, and parent phone contacts
+    - Two-tap active trip execution (`TRIP_STARTED` -> `PICKED_UP`/`ABSENT` per child -> `DROPPED` at school gate -> `TRIP_COMPLETED`)
+    - Offline event persistence with `OfflineTripSyncQueue` and UUID idempotency keys
+    - Driver earnings calculation (gross collections, 10% platform fee deduction, and net bank payout ledger)
+    - Emergency incident reporting with category selection (breakdown, delay, student unwell)
+19. **Driver Mobile UI**: Implemented full React Native / Expo Router driver application in `apps/driver`:
+    - `AuthContext`: Phone OTP authentication, active session listener, and Ramesh Goud demo fast-login
+    - `(auth)/login`: +91 phone OTP login with 6-digit verification
+    - `(tabs)/index`: Two-tap active trip execution screen with live offline sync badge, safety protocol warning, and passenger stop boarding
+    - `(tabs)/roster`: Scoped student passenger roster with special health/care notes and direct one-tap guardian dialer
+    - `(tabs)/earnings`: Monthly gross subscription collections, 10% platform fee deduction, net payout calculation, and bank transfer history
+    - `(tabs)/profile`: Compliance status, approved vehicle specs, KYC documents checklist with upload action, incident reporting modal, and sign out
+20. **Automated Driver Journey tests**: 18 tests in `packages/api-client/src/driver-journey.test.ts` covering commercial driver onboarding, vehicle capacity rules, KYC audit locking, roster fetching, trip milestones, offline sync queue, earnings calculation, and incident reporting. Full monorepo test suite: **72/72 passing** (60 active, 12 sandbox-skipped).
 
