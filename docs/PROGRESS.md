@@ -176,5 +176,7 @@ RAZORPAY_WEBHOOK_SECRET=<webhook_secret>
 
 ### September 2026 — Supporting Work
 11. **Route optimizer**: Python CVRPTW solver in `services/route-optimizer`
-12. **Mobile apps scaffolded**: `apps/parent` (Expo Router), `apps/driver` (Expo Router)
-13. **Edge functions scaffolded**: Razorpay order creation, webhook handling, AI support assistant
+12. **Mobile apps scaffolded & typechecked**: `apps/parent` (Expo Router) and `apps/driver` (Expo Router) with zero TypeScript errors
+13. **Mobile Brand alignment**: Pinned local React 18 types in tsconfigs, eliminated HTML `<div>` syntax in favor of React Native `<View>`, and aligned all mobile layouts & `app.json` to Brand Guidelines v1.0 design tokens
+14. **Edge functions scaffolded**: Razorpay order creation, webhook handling, AI support assistant
+
