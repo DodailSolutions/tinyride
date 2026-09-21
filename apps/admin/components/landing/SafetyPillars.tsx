@@ -44,15 +44,15 @@ export function SafetyPillars() {
     <section id="safety" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold uppercase tracking-wider">
-            <Shield className="w-3.5 h-3.5" />
-            Zero-Compromise Safety Standard
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold uppercase tracking-wider">
+            <Shield className="w-3.5 h-3.5 text-emerald-600" />
+            Transparent Processes & Standards
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">
-            Engineered for Maximum Child Protection
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-brand-navy-900">
+            Accountable School Commute Standards
           </h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            TinyRide by Dodail was designed with multi-tier verification and strict compliance with the Telangana Motor Vehicle Rules and Indian Supreme Court school transport guidelines.
+            Trust is earned through transparent processes, verified information and dependable communication. TinyRide aligns with Telangana Motor Vehicle Rules and established school transport norms.
           </p>
         </div>
 

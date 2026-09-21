@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X, Shield, PhoneCall, ArrowRight, UserCheck } from 'lucide-react';
 
 interface LandingHeaderProps {
@@ -23,15 +24,22 @@ export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
     <header className="sticky top-0 z-50 backdrop-blur-md bg-brand-navy-950/90 border-b border-brand-navy-800/80 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-orange-500 flex items-center justify-center font-bold text-white shadow-lg shadow-orange-950/50">
-              TR
+          {/* Brand Logo & Lockup conforming to Brand Guidelines v1.0 */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-11 h-11 rounded-xl bg-white p-0.5 flex items-center justify-center shadow-lg shadow-brand-orange-500/20 overflow-hidden group-hover:ring-2 group-hover:ring-brand-orange-400 transition-all">
+              <Image
+                src="/brand/tinyride-master-logo.png"
+                alt="TinyRide by Dodail Logo"
+                width={44}
+                height={44}
+                className="object-contain"
+                priority
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-xl tracking-tight text-white">TinyRide</span>
-                <span className="text-[10px] font-bold text-brand-orange-400 uppercase tracking-wider bg-brand-navy-800 px-2 py-0.5 rounded-full border border-brand-orange-500/30">
+                <span className="text-[10px] font-bold text-brand-orange-400 uppercase tracking-wider bg-brand-navy-900 px-2 py-0.5 rounded-full border border-brand-orange-500/30">
                   by Dodail
                 </span>
               </div>
@@ -44,7 +52,7 @@ export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
             <a href="#safety" className="hover:text-white hover:text-brand-orange-400 transition-colors">
-              Safety Pillars
+              Pillars & Values
             </a>
             <a href="#calculator" className="hover:text-white hover:text-brand-orange-400 transition-colors">
               Fare Calculator
@@ -53,14 +61,14 @@ export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
               Schools
             </a>
             <a href="#faqs" className="hover:text-white hover:text-brand-orange-400 transition-colors">
-              FAQs
+              FAQs & Policies
             </a>
             <a href="#blog" className="hover:text-white hover:text-brand-orange-400 transition-colors">
-              Safety Guides
+              Knowledge Hub
             </a>
           </nav>
 
-          {/* Desktop CTAs */}
+          {/* Desktop CTAs conforming to Brand Guidelines */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/dashboard"
@@ -70,15 +78,15 @@ export function LandingHeader({ onOpenWaitlist }: LandingHeaderProps) {
             </Link>
             <button
               onClick={() => handleWaitlistClick('DRIVER')}
-              className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-brand-navy-800 text-brand-orange-400 hover:bg-brand-navy-700 transition-colors border border-brand-orange-500/30"
+              className="px-3.5 py-2 rounded-lg text-xs font-semibold bg-brand-navy-900 text-brand-orange-400 hover:bg-brand-navy-800 transition-colors border border-brand-orange-500/30"
             >
-              Drive with Us
+              Register as a Driver
             </button>
             <button
               onClick={() => handleWaitlistClick('PARENT')}
               className="px-4 py-2 rounded-lg text-xs font-bold bg-brand-orange-500 text-white hover:bg-brand-orange-600 shadow-md shadow-orange-950/40 transition-colors flex items-center gap-1.5"
             >
-              Join Hyderabad Waitlist
+              Get Started
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

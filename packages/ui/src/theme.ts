@@ -1,4 +1,50 @@
-// TinyRide by Dodail — Visual Identity & Design Tokens
+// TinyRide by Dodail — Visual Identity & Design Tokens (Brand Guidelines v1.0)
+
+export const brandTokens = {
+  deepNavy: '#142B4A',   // Trust, headings, primary fields
+  warmOrange: '#F07832', // Highlights and calls to action
+  softWhite: '#FFFFFF',  // Clean backgrounds
+  mistGrey: '#F3F5F7',   // Cards and dividers
+  slate: '#2F3948',      // Body copy
+} as const;
+
+export const brandGuidelines = {
+  version: '1.0',
+  brandName: 'TinyRide',
+  endorsement: 'by Dodail',
+  tagline: 'Little Rides. Big Peace of Mind.',
+  category: 'School-transport coordination / parent-driver platform',
+  brandPromise: 'A clearer, more coordinated way to arrange a child’s school commute.',
+  corePrinciple: 'Trust is earned through transparent processes, verified information and dependable communication.',
+  shortDescriptor: 'School transport, made easier to manage.',
+  parentFacingIntro: 'Arrange your child’s school commute with clearer route details, booking information and support.',
+  driverFacingIntro: 'Manage school transport bookings and communicate with families through TinyRide.',
+  trustOrientedLine: 'Clear information. Thoughtful coordination. Support when you need it.',
+  operatingModelDisclaimer: 'TinyRide is a school-transport coordination platform connecting independent commercial transport contractors with parents. Dodail does not own transport vehicles.',
+  messagePillars: [
+    {
+      pillar: 'Clarity',
+      message: 'Know the route, schedule, pricing and booking status.',
+      proofPoints: 'Route details, fee breakdowns, booking confirmations and policies.',
+    },
+    {
+      pillar: 'Connection',
+      message: 'A more organized connection between families and drivers.',
+      proofPoints: 'Driver profiles, support workflow and documented expectations.',
+    },
+    {
+      pillar: 'Peace of mind',
+      message: 'Feel informed—not left guessing—about the commute.',
+      proofPoints: 'Timely updates, escalation process and defined pickup/drop-off procedures.',
+    },
+  ],
+  hallmarks: [
+    { title: 'Safe', subtitle: 'Document verification & verified credentials' },
+    { title: 'Reliable', subtitle: 'Coordinated routes & clear schedules' },
+    { title: 'Trusted', subtitle: 'Transparent pricing & direct parent support' },
+    { title: 'Brighter Tomorrows', subtitle: 'Better commutes for kids & fair partnership for drivers' },
+  ],
+} as const;
 
 export const colors = {
   // Brand Primary Navy
@@ -11,9 +57,9 @@ export const colors = {
     500: '#627D98',
     600: '#486581',
     700: '#334E68',
-    800: '#1B2F4E', // Brand Primary Dark
-    900: '#0F1E36', // Brand Deep Navy
-    950: '#070D18',
+    800: '#1E3A5F',
+    900: '#142B4A', // Official Deep Navy (Brand Guidelines v1.0)
+    950: '#0C1A2E',
   },
 
   // Brand Accent Orange
@@ -23,8 +69,8 @@ export const colors = {
     200: '#FDCBA8',
     300: '#FBAF7D',
     400: '#FA9351',
-    500: '#FF6B00', // Brand Core Accent
-    600: '#E05D00',
+    500: '#F07832', // Official Warm Orange (Brand Guidelines v1.0)
+    600: '#D96522',
     700: '#B84C00',
     800: '#8F3B00',
     900: '#662A00',

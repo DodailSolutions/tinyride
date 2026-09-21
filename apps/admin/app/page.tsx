@@ -34,10 +34,11 @@ export default function LandingPage() {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: 'TinyRide by Dodail',
-    image: 'https://tinyride.in/og-image.jpg',
+    image: 'https://tinyride.in/brand/tinyride-master-logo.png',
     '@id': 'https://tinyride.in',
     url: 'https://tinyride.in',
     telephone: '+914045678900',
+    description: 'School transport coordination platform by Dodail. Little Rides. Big Peace of Mind.',
     priceRange: '₹2500 - ₹4500/month',
     address: {
       '@type': 'PostalAddress',

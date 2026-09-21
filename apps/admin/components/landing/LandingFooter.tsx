@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Shield, PhoneCall, Mail, MapPin, ExternalLink } from 'lucide-react';
 
 export function LandingFooter() {
@@ -6,22 +7,33 @@ export function LandingFooter() {
     <footer className="bg-brand-navy-950 text-slate-400 border-t border-brand-navy-900 pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-brand-navy-900">
-          {/* Col 1 & 2: Brand Info */}
+          {/* Col 1 & 2: Brand Info conforming to Brand Guidelines v1.0 */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-brand-orange-500 flex items-center justify-center font-bold text-white shadow-md shadow-orange-950/40">
-                TR
+              <div className="w-10 h-10 rounded-xl bg-white p-0.5 flex items-center justify-center shadow-md shadow-brand-orange-500/20 overflow-hidden">
+                <Image
+                  src="/brand/tinyride-master-logo.png"
+                  alt="TinyRide by Dodail Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
               </div>
               <div>
-                <span className="font-extrabold text-xl tracking-tight text-white">TinyRide</span>
-                <span className="ml-2 text-[10px] font-bold text-brand-orange-400 uppercase tracking-wider bg-brand-navy-900 px-2 py-0.5 rounded-full border border-brand-orange-500/30">
-                  by Dodail
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-xl tracking-tight text-white">TinyRide</span>
+                  <span className="text-[10px] font-bold text-brand-orange-400 uppercase tracking-wider bg-brand-navy-900 px-2 py-0.5 rounded-full border border-brand-orange-500/30">
+                    by Dodail
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 font-medium">
+                  Little Rides. Big Peace of Mind.
+                </p>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-              Dodail Solutions Private Limited's AI-assisted school transport platform connecting Hyderabad parents with verified independent auto and van drivers.
+              School commute coordination for families and independent drivers. Providing clearer route details, transparent arrangements, and dependable support.
             </p>
 
             <div className="space-y-2 text-xs text-slate-400 pt-2">

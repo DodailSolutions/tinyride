@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Sliders,
   Globe,
@@ -18,6 +19,13 @@ import {
   PhoneCall,
   MapPin,
   ExternalLink,
+  Download,
+  Copy,
+  Shield,
+  Heart,
+  Leaf,
+  AlertTriangle,
+  BookOpen,
 } from 'lucide-react';
 import { AdminShell } from '@/components/AdminShell';
 import { FAQ_DATA } from '@/components/landing/FaqAccordion';
@@ -86,25 +94,25 @@ const INITIAL_LEADS: LeadItem[] = [
 ];
 
 export default function ContentManagementSystemPage() {
-  const [activeTab, setActiveTab] = useState<'SEO' | 'HERO' | 'FAQS' | 'ARTICLES' | 'LEADS'>('SEO');
+  const [activeTab, setActiveTab] = useState<'SEO' | 'HERO' | 'FAQS' | 'ARTICLES' | 'LEADS' | 'BRAND'>('BRAND');
 
-  // SEO State
-  const [siteTitle, setSiteTitle] = useState('TinyRide by Dodail — Trusted School Transport Platform in Hyderabad');
+  // SEO State conforming to Brand Guidelines v1.0
+  const [siteTitle, setSiteTitle] = useState('TinyRide by Dodail — Little Rides. Big Peace of Mind.');
   const [metaDesc, setMetaDesc] = useState(
-    'Safe, verified, and transparent school auto & van transport in Hyderabad. Real-time child tracking, police-verified drivers, and transparent monthly subscriptions for DPS, Oakridge, HPS, and Glendale.'
+    'School transport, made easier to manage. Arrange your child’s school commute with clearer route details, verified driver credentials, and dependable support in Hyderabad.'
   );
   const [canonicalUrl, setCanonicalUrl] = useState('https://tinyride.in');
   const [keywords, setKeywords] = useState(
-    'school transport hyderabad, school van gachibowli, school auto kondapur, child safety transport, dps gachibowli, tinyride dodail'
+    'school transport coordination, school van hyderabad, school auto gachibowli, tinyride dodail, little rides big peace of mind'
   );
   const [isSaved, setIsSaved] = useState(false);
 
-  // Hero State
-  const [heroHeadline, setHeroHeadline] = useState('Safe, Verified School Transport for Hyderabad Kids');
+  // Hero State conforming to Brand Guidelines v1.0
+  const [heroHeadline, setHeroHeadline] = useState('School transport, made easier to manage.');
   const [heroSubheadline, setHeroSubheadline] = useState(
-    'TinyRide connects parents with strictly vetted independent school auto and van drivers. Enjoy real-time boarding alerts, transparent monthly UPI subscriptions, and zero vehicle overcrowding.'
+    'Arrange your child’s school commute with clearer route details, verified driver information, and dependable support. A more coordinated connection between Hyderabad families and independent drivers.'
   );
-  const [heroBadge, setHeroBadge] = useState('Hyderabad Pilot Now Live — Gachibowli, Begumpet, Manikonda & Sun City');
+  const [heroBadge, setHeroBadge] = useState('TinyRide by Dodail • Hyderabad School Commute Coordination');
 
   // FAQs State
   const [faqs, setFaqs] = useState<FaqItem[]>(
@@ -193,6 +201,7 @@ export default function ContentManagementSystemPage() {
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 border-b border-slate-200 pb-1 overflow-x-auto">
           {[
+            { key: 'BRAND', label: 'Brand Guidelines v1.0' },
             { key: 'SEO', label: 'SEO & Search Snippet' },
             { key: 'HERO', label: 'Hero & Headlines' },
             { key: 'FAQS', label: `FAQs (${faqs.length})` },
@@ -590,6 +599,234 @@ export default function ContentManagementSystemPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 0: BRAND GUIDELINES v1.0 */}
+        {activeTab === 'BRAND' && (
+          <div className="space-y-8">
+            {/* Header Banner */}
+            <div className="bg-gradient-to-r from-brand-navy-900 to-[#1E3A5F] text-white p-8 rounded-3xl shadow-lg relative overflow-hidden">
+              <div className="relative z-10 max-w-3xl space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-navy-800 text-brand-orange-400 border border-brand-orange-500/30 text-xs font-bold">
+                  <Sparkles className="w-3.5 h-3.5" /> Working Brand Foundation • Version 1.0
+                </div>
+                <h2 className="text-3xl font-black tracking-tight text-white">
+                  TinyRide by Dodail — Brand Guidelines
+                </h2>
+                <p className="text-sm text-slate-200 leading-relaxed">
+                  School-transport coordination platform by Dodail. Designed to make school journeys feel more organized, understandable, and reassuring—without making safety promises the service cannot substantiate.
+                </p>
+                <div className="flex flex-wrap gap-4 pt-2 text-xs font-semibold text-slate-300">
+                  <span>Tagline: <strong className="text-brand-orange-400 font-bold">Little Rides. Big Peace of Mind.</strong></span>
+                  <span>•</span>
+                  <span>Owner: <strong className="text-white">Dodail Solutions Pvt. Ltd.</strong></span>
+                  <span>•</span>
+                  <span>Status: <strong className="text-emerald-400">Approved MVP Direction</strong></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 1: Master Visual & Logo Artwork */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-brand-orange-600" /> 1. Master Logo & Official Artwork
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Use only the approved TinyRide master logo. Maintain clear space equal to the height of the &quot;T&quot; on all sides.
+                  </p>
+                </div>
+                <a
+                  href="/brand/tinyride-master-logo.png"
+                  download="tinyride-master-logo.png"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-navy-900 text-white hover:bg-brand-navy-800 text-xs font-bold shadow-sm transition-colors"
+                >
+                  <Download className="w-4 h-4" /> Download Master PNG (941×941)
+                </a>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                {/* Artwork display */}
+                <div className="md:col-span-5 flex flex-col items-center">
+                  <div className="relative w-full max-w-sm aspect-square bg-slate-50 border border-slate-200 rounded-2xl p-6 flex items-center justify-center shadow-inner">
+                    <Image
+                      src="/brand/tinyride-master-logo.png"
+                      alt="TinyRide Master Logo"
+                      width={320}
+                      height={320}
+                      className="object-contain"
+                    />
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-400 mt-2">
+                    tinyride-master-logo.png • 941×941 RGBA
+                  </span>
+                </div>
+
+                {/* Logo Rules */}
+                <div className="md:col-span-7 space-y-4 text-xs">
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <h4 className="font-bold text-slate-900 uppercase tracking-wide">Logo Lockup Standards</h4>
+                    <ul className="space-y-1.5 text-slate-600 list-disc list-inside">
+                      <li>Use only the approved master logo artwork. Keep it legible and proportionally intact.</li>
+                      <li>Maintain clear space: working minimum is the height of the &quot;T&quot; on all sides.</li>
+                      <li>Do not stretch, skew, rotate, recolor, add drop shadows/effects, or rearrange elements.</li>
+                      <li>Do not recreate the wordmark with a substitute font.</li>
+                      <li>Keep &quot;by Dodail&quot; endorsement consistent with the approved lockup.</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1">
+                    <h4 className="font-bold uppercase tracking-wide flex items-center gap-1.5 text-amber-900">
+                      <AlertTriangle className="w-4 h-4 text-amber-700" /> Master Hallmarks
+                    </h4>
+                    <p className="text-[11px] leading-relaxed">
+                      The four bottom badges in the master illustration represent the core service standards:
+                      <strong> Safe</strong> (Green shield), <strong>Reliable</strong> (Amber users), <strong>Trusted</strong> (Rose heart), and <strong>Brighter Tomorrows</strong> (Emerald leaf).
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Color Palette Tokens */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+              <h3 className="text-lg font-bold text-slate-900">2. Visual Identity & Color Palette</h3>
+              <p className="text-xs text-slate-500">
+                The working brand palette tokens defined in Version 1.0 specifications.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pt-2">
+                <div className="p-4 rounded-xl border border-slate-200 space-y-3 bg-white">
+                  <div className="h-16 rounded-lg shadow-sm" style={{ backgroundColor: '#142B4A' }} />
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Deep Navy</p>
+                    <p className="text-[11px] font-mono text-slate-500">#142B4A</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Trust, headings, primary fields</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-200 space-y-3 bg-white">
+                  <div className="h-16 rounded-lg shadow-sm" style={{ backgroundColor: '#F07832' }} />
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Warm Orange</p>
+                    <p className="text-[11px] font-mono text-slate-500">#F07832</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Highlights & calls to action</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-200 space-y-3 bg-white">
+                  <div className="h-16 rounded-lg border border-slate-300 shadow-sm" style={{ backgroundColor: '#FFFFFF' }} />
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Soft White</p>
+                    <p className="text-[11px] font-mono text-slate-500">#FFFFFF</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Clean backgrounds</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-200 space-y-3 bg-white">
+                  <div className="h-16 rounded-lg shadow-sm" style={{ backgroundColor: '#F3F5F7' }} />
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Mist Grey</p>
+                    <p className="text-[11px] font-mono text-slate-500">#F3F5F7</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Cards & dividers</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-200 space-y-3 bg-white">
+                  <div className="h-16 rounded-lg shadow-sm" style={{ backgroundColor: '#2F3948' }} />
+                  <div>
+                    <p className="text-xs font-bold text-slate-900">Slate</p>
+                    <p className="text-[11px] font-mono text-slate-500">#2F3948</p>
+                    <p className="text-[11px] text-slate-600 mt-1">Readable body copy</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Brand Core & Positioning */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4 text-xs">
+                <h3 className="text-base font-bold text-slate-900">3. Purpose, Mission & Vision</h3>
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-bold text-slate-800 uppercase tracking-wide text-[10px]">Purpose</span>
+                    <p className="text-slate-600 mt-0.5">Reduce the everyday uncertainty parents experience when arranging school transport.</p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-slate-800 uppercase tracking-wide text-[10px]">Mission</span>
+                    <p className="text-slate-600 mt-0.5">Make school commuting easier to arrange and manage through clear booking, communication, and support processes.</p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-slate-800 uppercase tracking-wide text-[10px]">Vision</span>
+                    <p className="text-slate-600 mt-0.5">A future where families can manage school transport with greater clarity, consistency, and confidence.</p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-slate-800 uppercase tracking-wide text-[10px]">Core Principle</span>
+                    <p className="text-slate-600 mt-0.5 font-medium italic">“Trust is earned through transparent processes, verified information and dependable communication.”</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4 text-xs">
+                <h3 className="text-base font-bold text-slate-900">4. Core Values</h3>
+                <div className="space-y-2.5">
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="font-bold text-slate-800">Child-first thinking:</span>
+                    <p className="text-slate-600 mt-0.5">Account for children’s wellbeing and age-appropriate physical and emotional needs.</p>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="font-bold text-slate-800">Trust through transparency:</span>
+                    <p className="text-slate-600 mt-0.5">Explain what is verified, what is included, and what remains the independent driver’s responsibility.</p>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="font-bold text-slate-800">Reliability & Respect:</span>
+                    <p className="text-slate-600 mt-0.5">Set clear expectations, communicate schedule changes promptly, and treat drivers as essential partners.</p>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="font-bold text-slate-800">Accountability:</span>
+                    <p className="text-slate-600 mt-0.5">Provide clear, immediate paths for parent questions, incidents, and issue resolution.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 4: Tone, Compliance & Claims to Avoid */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4 text-xs">
+              <h3 className="text-base font-bold text-slate-900">5. Messaging Compliance & Claims to Avoid</h3>
+              <p className="text-slate-500">
+                All platform copy, app content, customer service responses, and social media posts must follow these non-negotiable boundaries:
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 space-y-2">
+                  <h4 className="font-bold uppercase tracking-wide text-rose-800 flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 text-rose-600" /> Never Use / Avoid
+                  </h4>
+                  <ul className="space-y-1 text-rose-900 list-disc list-inside">
+                    <li><strong>&quot;100% safe&quot;</strong>, <strong>&quot;zero risk&quot;</strong>, or <strong>&quot;guaranteed safety&quot;</strong></li>
+                    <li><strong>&quot;Every driver is police-verified&quot;</strong> unless exact status and certificate are audited</li>
+                    <li><strong>&quot;Always on time&quot;</strong> or guaranteed arrival time claims</li>
+                    <li>Any suggestion that TinyRide owns, leases, or directly operates transport vehicles</li>
+                    <li>Overly sentimental, childish, or fear-based messaging</li>
+                  </ul>
+                </div>
+
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 space-y-2">
+                  <h4 className="font-bold uppercase tracking-wide text-emerald-800 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Approved Wording & Tone
+                  </h4>
+                  <ul className="space-y-1 text-emerald-900 list-disc list-inside">
+                    <li><strong>&quot;Little Rides. Big Peace of Mind.&quot;</strong></li>
+                    <li><strong>&quot;School transport, made easier to manage.&quot;</strong></li>
+                    <li><strong>&quot;Clear information. Thoughtful coordination. Support when you need it.&quot;</strong></li>
+                    <li>Explain exact verification steps: DL audit, vehicle fitness check, and Police Clearance submission</li>
+                    <li>Always include operating disclaimer: <em>TinyRide is a coordination platform; Dodail does not own transport vehicles.</em></li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         )}

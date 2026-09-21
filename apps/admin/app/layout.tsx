@@ -4,19 +4,19 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://tinyride.in'),
   title: {
-    default: 'TinyRide by Dodail — Trusted School Transport Platform in Hyderabad',
+    default: 'TinyRide by Dodail — Little Rides. Big Peace of Mind.',
     template: '%s | TinyRide by Dodail',
   },
   description:
-    'Safe, verified, and transparent school auto & van transport in Hyderabad. Real-time child tracking, police-verified drivers, and transparent monthly subscriptions for DPS, Oakridge, HPS, and Glendale.',
+    'School transport, made easier to manage. Arrange your child’s school commute with clearer route details, verified driver credentials, and dependable support in Hyderabad.',
   keywords: [
-    'school transport hyderabad',
+    'school transport coordination hyderabad',
     'school van gachibowli',
     'school auto kondapur',
-    'school cab manikonda',
+    'school commute manikonda',
     'dps gachibowli transport',
-    'oakridge international school bus',
-    'child safety transport hyderabad',
+    'oakridge international school commute',
+    'child school commute hyderabad',
     'tinyride dodail',
   ],
   authors: [{ name: 'Dodail Solutions Private Limited', url: 'https://dodail.com' }],
@@ -30,16 +30,26 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'TinyRide by Dodail — Little Rides. Big Peace of Mind.',
     description:
-      'Connecting Hyderabad parents with police-verified school auto & van drivers. Zero overcrowding, real-time trip milestones, and monthly digital billing.',
+      'TinyRide by Dodail • School commute coordination for families and drivers. • Little Rides. Big Peace of Mind.',
     url: 'https://tinyride.in',
     siteName: 'TinyRide',
+    images: [
+      {
+        url: '/brand/tinyride-master-logo.png',
+        width: 941,
+        height: 941,
+        alt: 'TinyRide by Dodail Master Logo & Illustration',
+      },
+    ],
     locale: 'en_IN',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TinyRide by Dodail — School Transport Hyderabad',
-    description: 'Little Rides. Big Peace of Mind. 100% Police Verified Drivers & Real-time Child Boarding Milestones.',
+    title: 'TinyRide by Dodail — Little Rides. Big Peace of Mind.',
+    description:
+      'TinyRide by Dodail • School commute coordination for families and drivers. • Clear information. Thoughtful coordination. Support when you need it.',
+    images: ['/brand/tinyride-master-logo.png'],
     creator: '@DodailSolutions',
   },
   robots: {

@@ -18,8 +18,9 @@ module.exports = {
             500: '#627D98',
             600: '#486581',
             700: '#334E68',
-            800: '#1B2F4E',
-            900: '#0F1E36',
+            800: '#1E3A5F',
+            900: '#142B4A', // Official Deep Navy (Brand Guidelines v1.0)
+            950: '#0C1A2E',
           },
           orange: {
             50: '#FFF5EB',
@@ -27,10 +28,12 @@ module.exports = {
             200: '#FDCBA8',
             300: '#FBAF7D',
             400: '#FA9351',
-            500: '#FF6B00',
-            600: '#E05D00',
+            500: '#F07832', // Official Warm Orange (Brand Guidelines v1.0)
+            600: '#D96522',
             700: '#B84C00',
           },
+          mist: '#F3F5F7',
+          slate: '#2F3948',
         },
       },
     },

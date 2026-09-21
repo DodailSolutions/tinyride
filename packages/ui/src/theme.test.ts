@@ -20,8 +20,8 @@ describe('UI Theme & Formatters', () => {
     expect(formatTime12h('00:00')).toBe('12:00 AM');
   });
 
-  it('contains valid Brand Navy and Orange hex colors', () => {
-    expect(colors.navy[900]).toBe('#0F1E36');
-    expect(colors.orange[500]).toBe('#FF6B00');
+  it('contains valid Brand Navy and Orange hex colors conforming to Brand Guidelines v1.0', () => {
+    expect(colors.navy[900]).toBe('#142B4A');
+    expect(colors.orange[500]).toBe('#F07832');
   });
 });
