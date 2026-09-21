@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "TinyRide Parent",
+    "slug": "tinyride-parent",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "tinyride-parent",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F1E36"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.dodail.tinyride.parent",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "TinyRide needs location access to set your child's home pickup and drop coordinates."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F1E36"
+      },
+      "package": "com.dodail.tinyride.parent",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

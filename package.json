@@ -1,0 +1,23 @@
+{
+  "name": "tinyride-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TinyRide by Dodail — AI-Assisted School Transportation Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  },
+  "packageManager": "pnpm@10.23.0"
+}
