@@ -5,3 +5,6 @@ export * from './parent-api';
 export * from './driver-api';
 export * from './admin-api';
 export * from './route-optimizer';
+export * from './ai-support/llm-provider';
+export * from './ai-support/knowledge-base';
+export * from './ai-support/assistant-service';

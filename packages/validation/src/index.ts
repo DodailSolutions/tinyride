@@ -313,4 +313,26 @@ export const routeApprovalSchema = z.object({
   admin_notes: z.string().trim().max(500).optional(),
 });
 
+// ============================================================================
+// 6. AI CUSTOMER SUPPORT SCHEMAS
+// ============================================================================
+
+export const aiAssistantRequestSchema = z.object({
+  user_id: z.string().min(1, 'User ID is required'),
+  user_role: z.enum(['parent', 'driver', 'operations_admin', 'super_admin']),
+  message: z.string().trim().min(1, 'Message cannot be empty').max(1000, 'Message cannot exceed 1000 characters'),
+  conversation_history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().trim().max(1000),
+      })
+    )
+    .max(10, 'Cannot exceed 10 past messages')
+    .optional(),
+});
+
+export type AIAssistantRequestInput = z.infer<typeof aiAssistantRequestSchema>;
+
+
 

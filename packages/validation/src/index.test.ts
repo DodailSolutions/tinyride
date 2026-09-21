@@ -5,6 +5,7 @@ import {
   vehicleSchema,
   tripEventSchema,
   createBookingSchema,
+  aiAssistantRequestSchema,
 } from './index';
 
 describe('Validation Package Tests', () => {
@@ -98,4 +99,38 @@ describe('Validation Package Tests', () => {
       expect(tripEventSchema.safeParse(invalidEvent).success).toBe(false);
     });
   });
+
+  describe('AI Assistant Request Schema', () => {
+    it('validates a valid AI query request', () => {
+      const validQuery = {
+        user_id: 'parent_123',
+        user_role: 'parent' as const,
+        message: 'What is the refund policy for school holidays?',
+        conversation_history: [
+          { role: 'user' as const, content: 'Hi' },
+          { role: 'assistant' as const, content: 'Hello! How can I help you today?' },
+        ],
+      };
+      expect(aiAssistantRequestSchema.safeParse(validQuery).success).toBe(true);
+    });
+
+    it('rejects empty messages or invalid user roles', () => {
+      expect(
+        aiAssistantRequestSchema.safeParse({
+          user_id: 'parent_123',
+          user_role: 'parent',
+          message: '   ',
+        }).success
+      ).toBe(false);
+
+      expect(
+        aiAssistantRequestSchema.safeParse({
+          user_id: 'parent_123',
+          user_role: 'unauthorized_role',
+          message: 'Hello',
+        }).success
+      ).toBe(false);
+    });
+  });
 });
+

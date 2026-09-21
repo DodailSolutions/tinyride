@@ -248,3 +248,26 @@ RAZORPAY_WEBHOOK_SECRET=<webhook_secret>
     - `(tabs)/profile`: Compliance status, approved vehicle specs, KYC documents checklist with upload action, incident reporting modal, and sign out
 20. **Automated Driver Journey tests**: 25 tests in `packages/api-client/src/driver-journey.test.ts` covering commercial driver onboarding, vehicle capacity rules, KYC audit locking, roster fetching, trip milestones, driver authorization checks, route config, seat availability, booking requests, shift schedules, offline sync queue, earnings calculation, and incident reporting. Full monorepo test suite: **79/79 passing** (67 active, 12 sandbox-skipped).
 
+### September 2026 — Phase 7 Admin Operations & AI Systems
+21. **Admin Operations Dashboard Modules**:
+    - Created `packages/api-client/src/admin-api.ts` with role-scoped permissions, server actions, and immutable audit logging.
+    - Implemented full operations modules in `apps/admin/app`: driver KYC verification, vehicle inspection, parent directory, pilot schools, routes & seat allocation, bookings, financial payments & driver payouts, live trip tracking, safety incidents, support tickets, and audit logs.
+    - 19 automated tests in `packages/api-client/src/admin-permissions.test.ts` proving operations admin vs parent/driver privilege separation.
+
+22. **AI-001 Route Optimization Engine**:
+    - Built Google OR-Tools CVRPTW solver with heuristic fallback in `services/route-optimizer/`.
+    - FastAPI microservice in `services/route-optimizer/app.py`, multi-stage Dockerfile, and synthetic Hyderabad test fixtures.
+    - Built TypeScript client `packages/api-client/src/route-optimizer.ts` and Admin Route Optimization Desk in `apps/admin/app/routes/optimize/page.tsx` enforcing mandatory human admin approval before publishing route changes.
+    - 5/5 Python tests passing (`test_optimizer.py`) and 13/13 TypeScript tests passing (`route-optimizer.test.ts`).
+
+23. **AI-004 Customer Support Assistant**:
+    - Built provider-independent LLM interface (`LLMProvider`) supporting Google Gemini, OpenAI-compatible APIs, and Deterministic Fallback in `packages/api-client/src/ai-support/llm-provider.ts`.
+    - Created authenticated context retrieval (`getPermittedContext`) strictly scoped to the caller's ID and role (`auth.uid()`).
+    - Built prompt data minimization and PII redaction (16-digit cards, Aadhaar numbers, CVVs).
+    - Implemented sliding-window rate limiter (10 requests per 60 seconds).
+    - Created approved FAQ knowledge base (`packages/api-client/src/ai-support/knowledge-base.ts`) covering pilot schools, Telangana vehicle capacities (Auto: 4-6, Van: 12-14), pricing (₹2,500–₹4,500), refunds, and driver KYC.
+    - Built anti-hallucination defense layer intercepting fabricated claims when no payments or active trips exist.
+    - Automated human escalation: Emergency life-safety queries immediately provide 24/7 Operations hotline (+91 40 4567 8900 / 112) and create `URGENT` tickets; payment disputes create `HIGH` priority tickets with policy quotes.
+    - Connected live to Supabase Edge Function (`supabase/functions/ai-support-assistant/index.ts`) and Parent App Support screen (`apps/parent/app/(tabs)/support.tsx`).
+    - 16/16 Vitest tests in `packages/api-client/src/ai-support.test.ts`. Total monorepo suite: **117 / 117 tests passing** (12 skipped RLS sandbox probes). Production Next.js build: 20/20 static pages generated cleanly.
+    - Created comprehensive documentation in `docs/AI_SUPPORT.md`.

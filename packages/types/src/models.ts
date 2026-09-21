@@ -441,3 +441,67 @@ export interface RouteRecommendationApproval {
   approved_at?: string;
 }
 
+// ============================================================================
+// AI-004 CUSTOMER SUPPORT ASSISTANT TYPES
+// ============================================================================
+
+export interface AIAssistantMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: string;
+}
+
+export interface PermittedUserContext {
+  user_id: string;
+  user_role: UserRole;
+  user_name: string;
+  active_bookings: Array<{
+    id: string;
+    child_name: string;
+    school_name: string;
+    route_name: string;
+    driver_name: string;
+    pickup_stop: string;
+    monthly_fee_inr: number;
+    status: string;
+  }>;
+  recent_payments: Array<{
+    id: string;
+    amount_inr: number;
+    status: string;
+    method: string;
+    created_at: string;
+  }>;
+  active_trip?: {
+    trip_id: string;
+    route_name: string;
+    status: string;
+    driver_name: string;
+    current_milestone: string;
+    last_event_time: string;
+  } | null;
+}
+
+export interface AIAssistantRequest {
+  user_id: string;
+  user_role: UserRole;
+  message: string;
+  conversation_history?: Array<{
+    role: 'user' | 'assistant';
+    content: string;
+  }>;
+}
+
+export interface AIAssistantResponse {
+  reply: string;
+  escalated: boolean;
+  escalation_reason?: 'EMERGENCY_SAFETY' | 'REFUND_DISPUTE' | 'UNRESOLVED_AMBIGUITY' | 'UNAUTHORIZED' | null;
+  ticket_id?: string | null;
+  grounded_facts_used: string[];
+  provider_used: string;
+  tokens_used: number;
+  timestamp: string;
+}
+
+
